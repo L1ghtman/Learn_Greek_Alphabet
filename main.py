@@ -17,17 +17,8 @@ class Game:
 
         self.global_trigger = 0
 
-        self.ans_1 = 0
-        self.ans_2 = 0
-        self.ans_3 = 0
-        self.ans_4 = 0
-        self.ans_5 = 0
-
-        self.ans_1_rect = 0, 0, 0, 0
-        self.ans_2_rect = 0, 0, 0, 0
-        self.ans_3_rect = 0, 0, 0, 0
-        self.ans_4_rect = 0, 0, 0, 0
-        self.ans_5_rect = 0, 0, 0, 0
+        self.answer_map = []
+        self.answer_pair = []
 
         self.i = 0
 
@@ -48,32 +39,41 @@ class Game:
         random.shuffle(answers)
 
         ans_font = pg.font.Font('freesansbold.ttf', 24)
+        """
+        self.ans_list.append(ans_font.render(alphabet[answers[0]][2], True, 'black', 'white'))
+        self.ans_rect_list.append(self.ans_list[0].get_rect())
+        self.ans_rect_list[0].center = ((RES[0]//6), (RES[1]//4)*3)
 
-        self.ans_1 = ans_font.render(alphabet[answers[0]][2], True, 'black', 'white')
-        self.ans_1_rect = self.ans_1.get_rect()
-        self.ans_1_rect.center = ((RES[0]//6), (RES[1]//4)*3)
+        self.ans_list.append(ans_font.render(alphabet[answers[1]][2], True, 'black', 'white'))
+        self.ans_rect_list.append(self.ans_list[1].get_rect())
+        self.ans_rect_list[1].center = ((RES[0] // 6) * 2, (RES[1] // 4) * 3)
 
-        self.ans_2 = ans_font.render(alphabet[answers[1]][2], True, 'black', 'white')
-        self.ans_2_rect = self.ans_2.get_rect()
-        self.ans_2_rect.center = ((RES[0] // 6) * 2, (RES[1] // 4) * 3)
+        self.ans_list.append(ans_font.render(alphabet[answers[2]][2], True, 'black', 'white'))
+        self.ans_rect_list.append(self.ans_list[2].get_rect())
+        self.ans_rect_list[2].center = ((RES[0] // 6) * 3, (RES[1] // 4) * 3)
 
-        self.ans_3 = ans_font.render(alphabet[answers[2]][2], True, 'black', 'white')
-        self.ans_3_rect = self.ans_3.get_rect()
-        self.ans_3_rect.center = ((RES[0] // 6) * 3, (RES[1] // 4) * 3)
+        self.ans_list.append(ans_font.render(alphabet[answers[3]][2], True, 'black', 'white'))
+        self.ans_rect_list.append(self.ans_list[3].get_rect())
+        self.ans_rect_list[3].center = ((RES[0] // 6) * 4, (RES[1] // 4) * 3)
 
-        self.ans_4 = ans_font.render(alphabet[answers[3]][2], True, 'black', 'white')
-        self.ans_4_rect = self.ans_4.get_rect()
-        self.ans_4_rect.center = ((RES[0] // 6) * 4, (RES[1] // 4) * 3)
+        self.ans_list.append(ans_font.render(alphabet[answers[4]][2], True, 'black', 'white'))
+        self.ans_rect_list.append(self.ans_list[4].get_rect())
+        self.ans_rect_list[4].center = ((RES[0] // 6) * 5, (RES[1] // 4) * 3)
 
-        self.ans_5 = ans_font.render(alphabet[answers[4]][2], True, 'black', 'white')
-        self.ans_5_rect = self.ans_5.get_rect()
-        self.ans_5_rect.center = ((RES[0] // 6) * 5, (RES[1] // 4) * 3)
+        self.screen.blit(self.answer_map[0][0], self.answer_map[0][1])
+        self.screen.blit(self.answer_map[1][0], self.answer_map[1][1])
+        self.screen.blit(self.answer_map[2][0], self.answer_map[2][1])
+        self.screen.blit(self.answer_map[3][0], self.answer_map[3][1])
+        self.screen.blit(self.answer_map[4][0], self.answer_map[4][1])
 
-        self.screen.blit(self.ans_1, self.ans_1_rect)
-        self.screen.blit(self.ans_2, self.ans_2_rect)
-        self.screen.blit(self.ans_3, self.ans_3_rect)
-        self.screen.blit(self.ans_4, self.ans_4_rect)
-        self.screen.blit(self.ans_5, self.ans_5_rect)
+        """
+        for a in range(0, 5):
+            self.answer_pair = []
+            self.answer_pair.append(ans_font.render(alphabet[answers[a]][2], True, 'black', 'white'))
+            self.answer_pair.append(self.answer_pair[0].get_rect())
+            self.answer_pair[1].center = ((RES[0] // 6) * (a + 1), (RES[1] // 4) * 3)
+            self.answer_map.append(self.answer_pair)
+            self.screen.blit(self.answer_map[a][0], self.answer_map[a][1])
 
     def draw(self):
         if self.game_state == 0:
@@ -123,8 +123,7 @@ class Game:
                     elif self.game_state == 1:
                         self.game_state = 2
 
-                        is_pressed, mouse_x, mouse_y = self.button_clicked([self.ans_1_rect, self.ans_2_rect, self.ans_3_rect,
-                                                                  self.ans_4_rect, self.ans_5_rect])
+                        is_pressed, mouse_x, mouse_y = self.button_clicked([pair[1] for pair in self.answer_map])
                         if is_pressed == 1:
                             self.global_trigger = 1
                             self.game_state = 3
@@ -135,7 +134,6 @@ class Game:
             if button[0] <= pos_x <= button[0] + button[2] and button[1] <= pos_y <= button[1] + button[3]:
                 return 1, pos_x, pos_y
         return 0, pos_x, pos_y
-
 
     def run(self):
         while True:
