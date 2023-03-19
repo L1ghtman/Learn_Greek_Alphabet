@@ -22,6 +22,8 @@ class Game:
 
         self.i = 0
 
+        self.detect = 'red'
+
     def new_game(self):
         pass
 
@@ -31,6 +33,7 @@ class Game:
         pg.display.set_caption(f'{self.clock.get_fps() :.1f}')
 
     def draw_answers(self, i):
+        self.answer_map = []
         indices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
         indices.remove(i)
         random.shuffle(indices)
@@ -38,42 +41,30 @@ class Game:
         answers = [indices[0], indices[1], indices[2], indices[3], i]
         random.shuffle(answers)
 
+        correct_ans_index = answers.index(i)
+
         ans_font = pg.font.Font('freesansbold.ttf', 24)
+
+        for a in range(0, 5):
+            self.answer_pair = [0, 0, 0]
+            #self.answer_pair.append(ans_font.render(alphabet[answers[a]][2], True, 'black', 'white'))
+            self.answer_pair[0] = ans_font.render(alphabet[answers[a]][2], True, 'black', 'white')
+            self.answer_pair[1] = self.answer_pair[0].get_rect()
+
+            if a == correct_ans_index:
+                self.answer_pair[2] = 1
+
+            self.answer_pair[1].center = ((RES[0] // 6) * (a + 1), (RES[1] // 4) * 3)
+            self.answer_map.append(self.answer_pair)
+            self.screen.blit(self.answer_map[a][0], self.answer_map[a][1])
+
         """
-        self.ans_list.append(ans_font.render(alphabet[answers[0]][2], True, 'black', 'white'))
-        self.ans_rect_list.append(self.ans_list[0].get_rect())
-        self.ans_rect_list[0].center = ((RES[0]//6), (RES[1]//4)*3)
-
-        self.ans_list.append(ans_font.render(alphabet[answers[1]][2], True, 'black', 'white'))
-        self.ans_rect_list.append(self.ans_list[1].get_rect())
-        self.ans_rect_list[1].center = ((RES[0] // 6) * 2, (RES[1] // 4) * 3)
-
-        self.ans_list.append(ans_font.render(alphabet[answers[2]][2], True, 'black', 'white'))
-        self.ans_rect_list.append(self.ans_list[2].get_rect())
-        self.ans_rect_list[2].center = ((RES[0] // 6) * 3, (RES[1] // 4) * 3)
-
-        self.ans_list.append(ans_font.render(alphabet[answers[3]][2], True, 'black', 'white'))
-        self.ans_rect_list.append(self.ans_list[3].get_rect())
-        self.ans_rect_list[3].center = ((RES[0] // 6) * 4, (RES[1] // 4) * 3)
-
-        self.ans_list.append(ans_font.render(alphabet[answers[4]][2], True, 'black', 'white'))
-        self.ans_rect_list.append(self.ans_list[4].get_rect())
-        self.ans_rect_list[4].center = ((RES[0] // 6) * 5, (RES[1] // 4) * 3)
-
         self.screen.blit(self.answer_map[0][0], self.answer_map[0][1])
         self.screen.blit(self.answer_map[1][0], self.answer_map[1][1])
         self.screen.blit(self.answer_map[2][0], self.answer_map[2][1])
         self.screen.blit(self.answer_map[3][0], self.answer_map[3][1])
         self.screen.blit(self.answer_map[4][0], self.answer_map[4][1])
-
         """
-        for a in range(0, 5):
-            self.answer_pair = []
-            self.answer_pair.append(ans_font.render(alphabet[answers[a]][2], True, 'black', 'white'))
-            self.answer_pair.append(self.answer_pair[0].get_rect())
-            self.answer_pair[1].center = ((RES[0] // 6) * (a + 1), (RES[1] // 4) * 3)
-            self.answer_map.append(self.answer_pair)
-            self.screen.blit(self.answer_map[a][0], self.answer_map[a][1])
 
     def draw(self):
         if self.game_state == 0:
@@ -106,7 +97,10 @@ class Game:
             self.game_state = 1
 
         if self.game_state == 3:
-            self.screen.fill('green')
+            self.screen.fill(self.detect)
+            baustelle = pg.image.load('sprites/baustelle.jpg')
+            baustelle_rect = baustelle.get_rect()
+            self.screen.blit(baustelle, baustelle_rect)
 
         # if self.global_trigger == 1:
             # pg.draw.rect(self.screen, 'green', self.ans_5_rect)
@@ -123,17 +117,26 @@ class Game:
                     elif self.game_state == 1:
                         self.game_state = 2
 
-                        is_pressed, mouse_x, mouse_y = self.button_clicked([pair[1] for pair in self.answer_map])
+                        is_pressed, button_rect = self.button_clicked([pair[1] for pair in self.answer_map])
                         if is_pressed == 1:
                             self.global_trigger = 1
                             self.game_state = 3
+                            if self.is_correct_answer(button_rect) == 1:
+                                self.detect = 'green'
 
     def button_clicked(self, buttons):
         pos_x, pos_y = pg.mouse.get_pos()
         for button in buttons:
             if button[0] <= pos_x <= button[0] + button[2] and button[1] <= pos_y <= button[1] + button[3]:
-                return 1, pos_x, pos_y
-        return 0, pos_x, pos_y
+                return 1, button
+        return 0, buttons[0]
+
+    def is_correct_answer(self, button):
+        for triple in self.answer_map:
+            rect = triple[1]
+            if rect == button and triple[2] == 1:
+                return 1
+        return 0
 
     def run(self):
         while True:
