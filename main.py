@@ -15,14 +15,13 @@ class Game:
 
         self.game_state = 0
 
-        self.global_trigger = 0
-
         self.answer_map = []
         self.answer_pair = []
 
-        self.i = 0
+        self.rnd = 0
 
-        self.detect = 'red'
+        self.selected = 0
+        self.correct = 0
 
     def new_game(self):
         pass
@@ -47,24 +46,41 @@ class Game:
 
         for a in range(0, 5):
             self.answer_pair = [0, 0, 0]
-            #self.answer_pair.append(ans_font.render(alphabet[answers[a]][2], True, 'black', 'white'))
             self.answer_pair[0] = ans_font.render(alphabet[answers[a]][2], True, 'black', 'white')
             self.answer_pair[1] = self.answer_pair[0].get_rect()
 
             if a == correct_ans_index:
                 self.answer_pair[2] = 1
+                self.correct = self.answer_pair
 
             self.answer_pair[1].center = ((RES[0] // 6) * (a + 1), (RES[1] // 4) * 3)
             self.answer_map.append(self.answer_pair)
             self.screen.blit(self.answer_map[a][0], self.answer_map[a][1])
 
-        """
-        self.screen.blit(self.answer_map[0][0], self.answer_map[0][1])
-        self.screen.blit(self.answer_map[1][0], self.answer_map[1][1])
-        self.screen.blit(self.answer_map[2][0], self.answer_map[2][1])
-        self.screen.blit(self.answer_map[3][0], self.answer_map[3][1])
-        self.screen.blit(self.answer_map[4][0], self.answer_map[4][1])
-        """
+    def draw_correct_answer(self):
+        self.screen.fill('black')
+
+        font_correct_hdr = pg.font.Font('freesansbold.ttf', 46)
+        text_correct_hdr = font_correct_hdr.render('The correct answer is:', True, 'black', 'white')
+        text_correct_hdr_rect = text_correct_hdr.get_rect()
+        text_correct_hdr_rect.center = (RES[0]//2, 100)
+
+        font_correct_ans = pg.font.Font('freesansbold.ttf', 36)
+        text_correct_ans = font_correct_ans.render(alphabet[self.rnd][2], True, 'black', 'white')
+        text_correct_ans_rect = text_correct_ans.get_rect()
+        text_correct_ans_rect.center = (RES[0]//2, 200)
+
+        font_selected_ans = pg.font.Font('freesansbold.ttf', 36)
+        text_selected_ans = font_selected_ans.render('You selected:', True, 'black', 'white')
+        text_selected_ans_rect = text_selected_ans.get_rect()
+        text_selected_ans_rect.center = (RES[0]//2 - 100, 400)
+
+        self.selected[1].center = (RES[0]//2 + 100, 400)
+
+        self.screen.blit(text_correct_hdr, text_correct_hdr_rect)
+        self.screen.blit(text_correct_ans, text_correct_ans_rect)
+        self.screen.blit(text_selected_ans, text_selected_ans_rect)
+        self.screen.blit(self.selected[0], self.selected[1])
 
     def draw(self):
         if self.game_state == 0:
@@ -79,7 +95,8 @@ class Game:
 
         elif self.game_state == 2:
             self.screen.fill('black')
-            i = random.randrange(0, 23, 1)
+            self.rnd = random.randrange(0, 23, 1)
+            i = self.rnd
 
             letter_rect = alphabet[i][(i % 2)].get_rect()
             letter_rect.center = (RES[0]//2, 200)
@@ -96,8 +113,11 @@ class Game:
 
             self.game_state = 1
 
-        if self.game_state == 3:
-            self.screen.fill(self.detect)
+        elif self.game_state == 3:
+            self.draw_correct_answer()
+
+        elif self.game_state == 4:
+            self.screen.fill('red')
             baustelle = pg.image.load('sprites/baustelle.jpg')
             baustelle_rect = baustelle.get_rect()
             self.screen.blit(baustelle, baustelle_rect)
@@ -115,19 +135,22 @@ class Game:
                     if self.game_state == 0:
                         self.game_state = 2
                     elif self.game_state == 1:
-                        self.game_state = 2
-
                         is_pressed, button_rect = self.button_clicked([pair[1] for pair in self.answer_map])
                         if is_pressed == 1:
-                            self.global_trigger = 1
-                            self.game_state = 3
                             if self.is_correct_answer(button_rect) == 1:
-                                self.detect = 'green'
+                                self.game_state = 3
+                            else:
+                                self.game_state = 4
+                        else:
+                            self.game_state = 2
 
     def button_clicked(self, buttons):
         pos_x, pos_y = pg.mouse.get_pos()
         for button in buttons:
             if button[0] <= pos_x <= button[0] + button[2] and button[1] <= pos_y <= button[1] + button[3]:
+                for pair in self.answer_map:
+                    if pair[1] == button:
+                        self.selected = pair
                 return 1, button
         return 0, buttons[0]
 
