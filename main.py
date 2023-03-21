@@ -18,6 +18,8 @@ class Game:
         self.answer_map = []
         self.answer_pair = []
 
+        self.state_3_buttons = []
+
         self.rnd = 0
 
         self.selected = 0
@@ -59,6 +61,8 @@ class Game:
 
     def draw_correct_answer(self):
         self.screen.fill('black')
+        self.state_3_buttons = [0, 0, 0]
+        font_buttons = pg.font.Font('freesansbold.ttf', 40)
 
         font_correct_hdr = pg.font.Font('freesansbold.ttf', 46)
         text_correct_hdr = font_correct_hdr.render('The correct answer is:', True, 'black', 'white')
@@ -72,15 +76,23 @@ class Game:
 
         font_selected_ans = pg.font.Font('freesansbold.ttf', 36)
         text_selected_ans = font_selected_ans.render('You selected:', True, 'black', 'white')
+        text_compliment = font_selected_ans.render('Well done!', True, 'black', 'white')
         text_selected_ans_rect = text_selected_ans.get_rect()
+        text_compliment_rect = text_compliment.get_rect()
         text_selected_ans_rect.center = (RES[0]//2 - 100, 400)
+        text_compliment_rect.center =(RES[0]//2 - 100, 500)
 
         self.selected[1].center = (RES[0]//2 + 100, 400)
+
+        self.state_3_buttons[0] = font_buttons.render('NEXT', True, 'black', 'white')
+        self.state_3_buttons[1] = self.state_3_buttons[0].get_rect()
+        self.state_3_buttons[1].center = (RES[0]//2 + 100, 400)
 
         self.screen.blit(text_correct_hdr, text_correct_hdr_rect)
         self.screen.blit(text_correct_ans, text_correct_ans_rect)
         self.screen.blit(text_selected_ans, text_selected_ans_rect)
         self.screen.blit(self.selected[0], self.selected[1])
+        self.screen.blit(self.state_3_buttons[0], self.state_3_buttons[1])
 
     def draw(self):
         if self.game_state == 0:
