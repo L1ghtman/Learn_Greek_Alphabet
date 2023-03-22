@@ -19,6 +19,7 @@ class Game:
         self.answer_pair = []
 
         self.state_3_buttons = []
+        self.state_4_buttons = []
 
         self.rnd = 0
 
@@ -44,8 +45,6 @@ class Game:
 
         correct_ans_index = answers.index(i)
 
-        ans_font = pg.font.Font('freesansbold.ttf', 24)
-
         for a in range(0, 5):
             self.answer_pair = [0, 0, 0]
             self.answer_pair[0] = ans_font.render(alphabet[answers[a]][2], True, 'black', 'white')
@@ -62,25 +61,10 @@ class Game:
     def draw_correct_answer(self):
         self.screen.fill('black')
         self.state_3_buttons = [0, 0, 0]
-        font_buttons = pg.font.Font('freesansbold.ttf', 40)
 
-        font_correct_hdr = pg.font.Font('freesansbold.ttf', 46)
-        text_correct_hdr = font_correct_hdr.render('The correct answer is:', True, 'black', 'white')
-        text_correct_hdr_rect = text_correct_hdr.get_rect()
-        text_correct_hdr_rect.center = (RES[0]//2, 100)
-
-        font_correct_ans = pg.font.Font('freesansbold.ttf', 36)
         text_correct_ans = font_correct_ans.render(alphabet[self.rnd][2], True, 'black', 'white')
         text_correct_ans_rect = text_correct_ans.get_rect()
         text_correct_ans_rect.center = (RES[0]//2, 200)
-
-        font_selected_ans = pg.font.Font('freesansbold.ttf', 36)
-        text_selected_ans = font_selected_ans.render('You selected:', True, 'black', 'white')
-        text_compliment = font_selected_ans.render('Well done!', True, 'black', 'white')
-        text_selected_ans_rect = text_selected_ans.get_rect()
-        text_compliment_rect = text_compliment.get_rect()
-        text_selected_ans_rect.center = (RES[0]//2 - 100, 400)
-        text_compliment_rect.center =(RES[0]//2 - 100, 500)
 
         self.selected[1].center = (RES[0]//2 + 100, 400)
 
@@ -94,12 +78,12 @@ class Game:
         self.screen.blit(self.selected[0], self.selected[1])
         self.screen.blit(self.state_3_buttons[0], self.state_3_buttons[1])
 
+    def draw_wrong_answer(self):
+        self.screen.fill('black')
+        self.state_4_buttons = [0, 0, 0]
+
     def draw(self):
         if self.game_state == 0:
-            font_start = pg.font.Font('freesansbold.ttf', 46)
-            text_start = font_start.render('Press Mouse Button To Start', True, 'black', 'white')
-            text_start_rect = text_start.get_rect()
-            text_start_rect.center = (RES[0]//2, RES[1]//2)
             self.screen.blit(text_start, text_start_rect)
 
         elif self.game_state == 1:
@@ -115,10 +99,6 @@ class Game:
 
             self.screen.blit(alphabet[i][(i % 2)], letter_rect)
 
-            font1 = pg.font.Font('freesansbold.ttf', 32)
-            text1 = font1.render('Which letter is this?', True, 'black', 'white')
-            text1_rect = text1.get_rect()
-            text1_rect.center = (RES[0]//2, 50)
             self.screen.blit(text1, text1_rect)
 
             self.draw_answers(i)
@@ -130,12 +110,6 @@ class Game:
 
         elif self.game_state == 4:
             self.screen.fill('red')
-            baustelle = pg.image.load('sprites/baustelle.jpg')
-            baustelle_rect = baustelle.get_rect()
-            self.screen.blit(baustelle, baustelle_rect)
-
-        # if self.global_trigger == 1:
-            # pg.draw.rect(self.screen, 'green', self.ans_5_rect)
 
     def check_events(self):
         for event in pg.event.get():
@@ -154,7 +128,7 @@ class Game:
                             else:
                                 self.game_state = 4
                         else:
-                            self.game_state = 2
+                            self.game_state = 1
 
     def button_clicked(self, buttons):
         pos_x, pos_y = pg.mouse.get_pos()
