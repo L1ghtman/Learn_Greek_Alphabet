@@ -24,7 +24,6 @@ class Game:
         self.rnd = 0
 
         self.selected = 0
-        self.correct = 0
 
     def new_game(self):
         pass
@@ -70,17 +69,34 @@ class Game:
 
         self.state_3_buttons[0] = font_buttons.render('NEXT', True, 'black', 'white')
         self.state_3_buttons[1] = self.state_3_buttons[0].get_rect()
-        self.state_3_buttons[1].center = (RES[0]//2 + 100, 400)
+        self.state_3_buttons[1].center = (RES[0]//2 + 100, 500)
 
         self.screen.blit(text_correct_hdr, text_correct_hdr_rect)
         self.screen.blit(text_correct_ans, text_correct_ans_rect)
         self.screen.blit(text_selected_ans, text_selected_ans_rect)
         self.screen.blit(self.selected[0], self.selected[1])
+        self.screen.blit(text_compliment, text_compliment_rect)
         self.screen.blit(self.state_3_buttons[0], self.state_3_buttons[1])
 
     def draw_wrong_answer(self):
         self.screen.fill('black')
         self.state_4_buttons = [0, 0, 0]
+
+        text_correct_ans = font_correct_ans.render(alphabet[self.rnd][2], True, 'black', 'white')
+        text_correct_ans_rect = text_correct_ans.get_rect()
+        text_correct_ans_rect.center = (RES[0] // 2, 200)
+
+        self.selected[1].center = (RES[0] // 2 + 100, 400)
+
+        self.state_4_buttons[0] = font_buttons.render('RETRY', True, 'black', 'white')
+        self.state_4_buttons[1] = self.state_4_buttons[0].get_rect()
+        self.state_4_buttons[1].center = (RES[0]//2, 500)
+
+        self.screen.blit(text_wrong_hdr, text_wrong_hdr_rect)
+        self.screen.blit(text_correct_ans, text_correct_ans_rect)
+        self.screen.blit(text_selected_ans, text_selected_ans_rect)
+        self.screen.blit(self.selected[0], self.selected[1])
+        self.screen.blit(self.state_4_buttons[0], self.state_4_buttons[1])
 
     def draw(self):
         if self.game_state == 0:
@@ -109,7 +125,7 @@ class Game:
             self.draw_correct_answer()
 
         elif self.game_state == 4:
-            self.screen.fill('red')
+            self.draw_wrong_answer()
 
     def check_events(self):
         for event in pg.event.get():
