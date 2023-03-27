@@ -24,6 +24,9 @@ class Game:
         self.rnd = 0
 
         self.selected = 0
+        self.correct = 0
+
+        self.prev_round = 0
 
     def new_game(self):
         pass
@@ -40,14 +43,16 @@ class Game:
         random.shuffle(indices)
 
         answers = [indices[0], indices[1], indices[2], indices[3], i]
+        self.prev_round = answers
         random.shuffle(answers)
 
         correct_ans_index = answers.index(i)
 
         for a in range(0, 5):
-            self.answer_pair = [0, 0, 0]
+            self.answer_pair = [0, 0, 0, 0]
             self.answer_pair[0] = ans_font.render(alphabet[answers[a]][2], True, 'black', 'white')
             self.answer_pair[1] = self.answer_pair[0].get_rect()
+            self.answer_pair[3] = alphabet[answers[a]][2]
 
             if a == correct_ans_index:
                 self.answer_pair[2] = 1
@@ -59,44 +64,47 @@ class Game:
 
     def draw_correct_answer(self):
         self.screen.fill('black')
-        self.state_3_buttons = [0, 0, 0]
+        button_pair = [0, 0]
 
         text_correct_ans = font_correct_ans.render(alphabet[self.rnd][2], True, 'black', 'white')
         text_correct_ans_rect = text_correct_ans.get_rect()
         text_correct_ans_rect.center = (RES[0]//2, 200)
 
-        self.selected[1].center = (RES[0]//2 + 100, 400)
+        selected = font_selected_ans.render(self.selected, True, 'black', 'white')
+        selected_rect = selected.get_rect()
+        selected_rect.center = (RES[0]//2 + 100, 400)
 
-        self.state_3_buttons[0] = font_buttons.render('NEXT', True, 'black', 'white')
-        self.state_3_buttons[1] = self.state_3_buttons[0].get_rect()
-        self.state_3_buttons[1].center = (RES[0]//2 + 100, 500)
+        button_pair[0] = font_buttons.render('NEXT', True, 'black', 'white')
+        button_pair[1] = button_pair[0].get_rect()
+        button_pair[1].center = (RES[0]//2 + 100, 500)
+
+        self.state_3_buttons.append(button_pair)
 
         self.screen.blit(text_correct_hdr, text_correct_hdr_rect)
         self.screen.blit(text_correct_ans, text_correct_ans_rect)
         self.screen.blit(text_selected_ans, text_selected_ans_rect)
-        self.screen.blit(self.selected[0], self.selected[1])
+        self.screen.blit(selected, selected_rect)
         self.screen.blit(text_compliment, text_compliment_rect)
-        self.screen.blit(self.state_3_buttons[0], self.state_3_buttons[1])
+        self.screen.blit(self.state_3_buttons[0][0], self.state_3_buttons[0][1])
 
     def draw_wrong_answer(self):
         self.screen.fill('black')
-        self.state_4_buttons = [0, 0, 0]
+        button_pair = [0, 0]
 
-        text_correct_ans = font_correct_ans.render(alphabet[self.rnd][2], True, 'black', 'white')
-        text_correct_ans_rect = text_correct_ans.get_rect()
-        text_correct_ans_rect.center = (RES[0] // 2, 200)
+        selected = font_selected_ans.render(self.selected, True, 'black', 'white')
+        selected_rect = selected.get_rect()
+        selected_rect.center = (RES[0] // 2 + 100, 400)
 
-        self.selected[1].center = (RES[0] // 2 + 100, 400)
+        button_pair[0] = font_buttons.render('RETRY', True, 'black', 'white')
+        button_pair[1] = button_pair[0].get_rect()
+        button_pair[1].center = (RES[0]//2, 500)
 
-        self.state_4_buttons[0] = font_buttons.render('RETRY', True, 'black', 'white')
-        self.state_4_buttons[1] = self.state_4_buttons[0].get_rect()
-        self.state_4_buttons[1].center = (RES[0]//2, 500)
+        self.state_4_buttons.append(button_pair)
 
         self.screen.blit(text_wrong_hdr, text_wrong_hdr_rect)
-        self.screen.blit(text_correct_ans, text_correct_ans_rect)
         self.screen.blit(text_selected_ans, text_selected_ans_rect)
-        self.screen.blit(self.selected[0], self.selected[1])
-        self.screen.blit(self.state_4_buttons[0], self.state_4_buttons[1])
+        self.screen.blit(selected, selected_rect)
+        self.screen.blit(self.state_4_buttons[0][0], self.state_4_buttons[0][1])
 
     def draw(self):
         if self.game_state == 0:
@@ -127,6 +135,22 @@ class Game:
         elif self.game_state == 4:
             self.draw_wrong_answer()
 
+        elif self.game_state == 5:
+            self.screen.fill('black')
+            i = self.rnd
+
+            letter_rect = alphabet[i][(i % 2)].get_rect()
+            letter_rect.center = (RES[0]//2, 200)
+
+            self.screen.blit(alphabet[i][(i % 2)], letter_rect)
+
+            self.screen.blit(text1, text1_rect)
+
+            for a in range(0, 5):
+                self.screen.blit(self.answer_map[a][0], self.answer_map[a][1])
+
+            self.game_state = 1
+
     def check_events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE):
@@ -145,6 +169,14 @@ class Game:
                                 self.game_state = 4
                         else:
                             self.game_state = 1
+                    elif self.game_state == 3:
+                        is_pressed, button_rect = self.button_clicked([pair[1] for pair in self.state_3_buttons])
+                        if is_pressed == 1:
+                            self.game_state = 2
+                    elif self.game_state == 4:
+                        is_pressed, button_rect = self.button_clicked([pair[1] for pair in self.state_4_buttons])
+                        if is_pressed == 1:
+                            self.game_state = 5
 
     def button_clicked(self, buttons):
         pos_x, pos_y = pg.mouse.get_pos()
@@ -152,7 +184,7 @@ class Game:
             if button[0] <= pos_x <= button[0] + button[2] and button[1] <= pos_y <= button[1] + button[3]:
                 for pair in self.answer_map:
                     if pair[1] == button:
-                        self.selected = pair
+                        self.selected = pair[3]
                 return 1, button
         return 0, buttons[0]
 
