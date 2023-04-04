@@ -16,7 +16,7 @@ class Game:
         self.game_state = 0
 
         self.answer_map = []
-        self.answer_pair = []
+        self.answer_pair = []   # [render, rect, is_correct, text]
 
         self.state_3_buttons = []
         self.state_4_buttons = []
@@ -28,6 +28,14 @@ class Game:
 
         self.prev_round = 0
 
+        """
+        levels:
+        level == 0 => draw lowercase symbol or name, ask for uppercase symbol
+        level == 1 => draw uppercase symbol or name, ask for lowercase symbol
+        level == 2 => draw symbol (lowercase or uppercase), ask for name
+        """
+        self.level = 2
+
     def new_game(self):
         pass
 
@@ -36,7 +44,7 @@ class Game:
         self.clock.tick(FPS)
         pg.display.set_caption(f'{self.clock.get_fps() :.1f}')
 
-    def draw_answers(self, i):
+    def draw_answers(self, i, lvl):
         self.answer_map = []
         indices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
         indices.remove(i)
@@ -50,9 +58,12 @@ class Game:
 
         for a in range(0, 5):
             self.answer_pair = [0, 0, 0, 0]
-            self.answer_pair[0] = ans_font.render(alphabet[answers[a]][2], True, 'black', 'white')
+            if lvl == 2:
+                self.answer_pair[0] = ans_font.render(alphabet[answers[a]][lvl], True, 'black', 'white')
+            else:
+                self.answer_pair[0] = alphabet[answers[a]][lvl]
             self.answer_pair[1] = self.answer_pair[0].get_rect()
-            self.answer_pair[3] = alphabet[answers[a]][2]
+            self.answer_pair[3] = alphabet[answers[a]][lvl]
 
             if a == correct_ans_index:
                 self.answer_pair[2] = 1
@@ -70,7 +81,7 @@ class Game:
         text_correct_ans_rect = text_correct_ans.get_rect()
         text_correct_ans_rect.center = (RES[0]//2, 200)
 
-        selected = font_selected_ans.render(self.selected, True, 'black', 'white')
+        selected = font_selected_ans.render(self.selected, True, 'black', 'green')
         selected_rect = selected.get_rect()
         selected_rect.center = (RES[0]//2 + 100, 400)
 
@@ -91,7 +102,7 @@ class Game:
         self.screen.fill('black')
         button_pair = [0, 0]
 
-        selected = font_selected_ans.render(self.selected, True, 'black', 'white')
+        selected = font_selected_ans.render(self.selected, True, 'black', 'red')
         selected_rect = selected.get_rect()
         selected_rect.center = (RES[0] // 2 + 100, 400)
 
@@ -106,7 +117,41 @@ class Game:
         self.screen.blit(selected, selected_rect)
         self.screen.blit(self.state_4_buttons[0][0], self.state_4_buttons[0][1])
 
+    def draw_letter(self, i, lvl):
+        j = random.randrange(0, 23) % 2
+        print(j)
+        k = random.randrange(0, 23) % 2
+        print(k)
+        match lvl:
+            case 0:
+                if k == 0:
+                    letter_rect = alphabet[i][1].get_rect()
+                    letter_rect.center = (RES[0] // 2, 200)
+                    self.screen.blit(alphabet[i][1], letter_rect)
+                else:
+                    letter = ans_font.render(alphabet[i][2], True, 'black', 'white')
+                    letter_rect = letter.get_rect()
+                    letter_rect.center = (RES[0] // 2, 200)
+                    self.screen.blit(letter, letter_rect)
+            case 1:
+                if k == 0:
+                    letter_rect = alphabet[i][0].get_rect()
+                    letter_rect.center = (RES[0] // 2, 200)
+                    self.screen.blit(alphabet[i][0], letter_rect)
+                else:
+                    letter = ans_font.render(alphabet[i][2], True, 'black', 'white')
+                    letter_rect = letter.get_rect()
+                    letter_rect.center = (RES[0] // 2, 200)
+                    self.screen.blit(letter, letter_rect)
+            case 2:
+                letter_rect = alphabet[i][j].get_rect()
+                letter_rect.center = (RES[0] // 2, 200)
+                self.screen.blit(alphabet[i][j], letter_rect)
+            case _:
+                pass
+
     def draw(self):
+        lvl = random.randrange(0, 2)
         if self.game_state == 0:
             self.screen.blit(text_start, text_start_rect)
 
@@ -115,17 +160,14 @@ class Game:
 
         elif self.game_state == 2:
             self.screen.fill('black')
-            self.rnd = random.randrange(0, 23, 1)
-            i = self.rnd
-
-            letter_rect = alphabet[i][(i % 2)].get_rect()
-            letter_rect.center = (RES[0]//2, 200)
-
-            self.screen.blit(alphabet[i][(i % 2)], letter_rect)
+            self.rnd = random.randrange(0, 23)
 
             self.screen.blit(text1, text1_rect)
 
-            self.draw_answers(i)
+            i = self.rnd
+            self.draw_letter(i, lvl)
+
+            self.draw_answers(i, lvl)
 
             self.game_state = 1
 
@@ -139,10 +181,7 @@ class Game:
             self.screen.fill('black')
             i = self.rnd
 
-            letter_rect = alphabet[i][(i % 2)].get_rect()
-            letter_rect.center = (RES[0]//2, 200)
-
-            self.screen.blit(alphabet[i][(i % 2)], letter_rect)
+            self.draw_letter(i, lvl)
 
             self.screen.blit(text1, text1_rect)
 
