@@ -27,6 +27,8 @@ class Game:
         self.correct = 0
 
         self.prev_round = 0
+        self.is_retry = 0
+        self.retry_pos = [0, 0]
 
         """
         levels:
@@ -45,7 +47,6 @@ class Game:
         pg.display.set_caption(f'{self.clock.get_fps() :.1f}')
 
     def draw_answers(self, i, lvl):
-        print(f'level: {lvl}')
         self.answer_map = []
         indices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
         indices.remove(i)
@@ -119,10 +120,18 @@ class Game:
         self.screen.blit(self.state_4_buttons[0][0], self.state_4_buttons[0][1])
 
     def draw_letter(self, i, lvl):
-        j = random.randrange(0, 23) % 2
-        print(f'j: {j}')
-        k = random.randrange(0, 23) % 2
+        print(f'level: {lvl}')
+        if self.is_retry == 1:
+            self.is_retry = 0
+            k = self.retry_pos[0]
+            j = self.retry_pos[1]
+        else:
+            k = random.randrange(0, 23) % 2
+            j = random.randrange(0, 23) % 2
+            self.retry_pos[0] = k
+            self.retry_pos[1] = j
         print(f'k: {k}')
+        print(f'j: {j}')
         match lvl:
             case 0:
                 if k == 0:
@@ -152,7 +161,7 @@ class Game:
                 pass
 
     def draw(self):
-        lvl = random.randrange(0, 3)
+
         if self.game_state == 0:
             self.screen.blit(text_start, text_start_rect)
 
@@ -162,13 +171,14 @@ class Game:
         elif self.game_state == 2:
             self.screen.fill('black')
             self.rnd = random.randrange(0, 23)
+            self.level = random.randrange(0, 3)
 
             self.screen.blit(text1, text1_rect)
 
             i = self.rnd
-            self.draw_letter(i, lvl)
+            self.draw_letter(i, self.level)
 
-            self.draw_answers(i, lvl)
+            self.draw_answers(i, self.level)
 
             self.game_state = 1
 
@@ -182,7 +192,7 @@ class Game:
             self.screen.fill('black')
             i = self.rnd
 
-            self.draw_letter(i, lvl)
+            self.draw_letter(i, self.level)
 
             self.screen.blit(text1, text1_rect)
 
@@ -217,6 +227,7 @@ class Game:
                         is_pressed, button_rect = self.button_clicked([pair[1] for pair in self.state_4_buttons])
                         if is_pressed == 1:
                             self.game_state = 5
+                            self.is_retry = 1
 
     def button_clicked(self, buttons):
         pos_x, pos_y = pg.mouse.get_pos()
