@@ -45,6 +45,7 @@ class Game:
         pg.display.set_caption(f'{self.clock.get_fps() :.1f}')
 
     def draw_answers(self, i, lvl):
+        print(f'level: {lvl}')
         self.answer_map = []
         indices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
         indices.remove(i)
@@ -59,11 +60,11 @@ class Game:
         for a in range(0, 5):
             self.answer_pair = [0, 0, 0, 0]
             if lvl == 2:
-                self.answer_pair[0] = ans_font.render(alphabet[answers[a]][lvl], True, 'black', 'white')
+                self.answer_pair[0] = ans_font.render(alphabet[answers[a]][2], True, 'black', 'white')
             else:
                 self.answer_pair[0] = alphabet[answers[a]][lvl]
             self.answer_pair[1] = self.answer_pair[0].get_rect()
-            self.answer_pair[3] = alphabet[answers[a]][lvl]
+            self.answer_pair[3] = alphabet[answers[a]][2]
 
             if a == correct_ans_index:
                 self.answer_pair[2] = 1
@@ -119,9 +120,9 @@ class Game:
 
     def draw_letter(self, i, lvl):
         j = random.randrange(0, 23) % 2
-        print(j)
+        print(f'j: {j}')
         k = random.randrange(0, 23) % 2
-        print(k)
+        print(f'k: {k}')
         match lvl:
             case 0:
                 if k == 0:
@@ -151,7 +152,7 @@ class Game:
                 pass
 
     def draw(self):
-        lvl = random.randrange(0, 2)
+        lvl = random.randrange(0, 3)
         if self.game_state == 0:
             self.screen.blit(text_start, text_start_rect)
 
