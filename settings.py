@@ -2,8 +2,11 @@ import pygame as pg
 pg.init()
 
 # game settings
-RES = WIDTH, HEIGT = 800, 600
+RES = WIDTH, HEIGHT = 1000, 600
 FPS = 60
+
+# draw question
+question_font = pg.font.Font('freesansbold.ttf', 64)
 
 # draw answers
 ans_font = pg.font.Font('freesansbold.ttf', 24)
@@ -27,7 +30,7 @@ text_compliment_rect.center = (RES[0] // 2 - 100, 500)
 
 # draw wrong answer
 font_wrong_hdr = pg.font.Font('freesansbold.ttf', 46)
-text_wrong_hdr = font_wrong_hdr.render('The correct answer is:', True, 'black', 'white')
+text_wrong_hdr = font_wrong_hdr.render('Wrong answer :( try again', True, 'black', 'white')
 text_wrong_hdr_rect = text_wrong_hdr.get_rect()
 text_wrong_hdr_rect.center = (RES[0]//2, 100)
 

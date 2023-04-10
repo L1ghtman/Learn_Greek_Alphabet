@@ -59,20 +59,26 @@ class Game:
         correct_ans_index = answers.index(i)
 
         for a in range(0, 5):
-            self.answer_pair = [0, 0, 0, 0]
+            self.answer_pair = [0, 0, 0, 0, 0]
             if lvl == 2:
                 self.answer_pair[0] = ans_font.render(alphabet[answers[a]][2], True, 'black', 'white')
             else:
                 self.answer_pair[0] = alphabet[answers[a]][lvl]
             self.answer_pair[1] = self.answer_pair[0].get_rect()
             self.answer_pair[3] = alphabet[answers[a]][2]
+            self.answer_pair[1].center = ((((RES[0] + 100) // 6) * (a + 1)) - 50, (RES[1] // 4) * 3)
+            self.answer_pair[4] = self.make_frame(self.answer_pair[1], 128, 176)
+            print(self.answer_pair[1])
+            print(self.answer_pair[4])
 
             if a == correct_ans_index:
                 self.answer_pair[2] = 1
                 self.correct = self.answer_pair
 
-            self.answer_pair[1].center = ((RES[0] // 6) * (a + 1), (RES[1] // 4) * 3)
             self.answer_map.append(self.answer_pair)
+
+            pg.draw.rect(self.screen, 'blue', self.answer_pair[4], 2)
+
             self.screen.blit(self.answer_map[a][0], self.answer_map[a][1])
 
     def draw_correct_answer(self):
@@ -126,7 +132,7 @@ class Game:
             k = self.retry_pos[0]
             j = self.retry_pos[1]
         else:
-            k = random.randrange(0, 23) % 2
+            k = 1   # random.randrange(0, 23) % 2
             j = random.randrange(0, 23) % 2
             self.retry_pos[0] = k
             self.retry_pos[1] = j
@@ -149,10 +155,12 @@ class Game:
                     letter_rect.center = (RES[0] // 2, 200)
                     self.screen.blit(alphabet[i][0], letter_rect)
                 else:
-                    letter = ans_font.render(alphabet[i][2], True, 'black', 'white')
+                    letter = question_font.render(alphabet[i][2], True, 'black', 'white')
                     letter_rect = letter.get_rect()
                     letter_rect.center = (RES[0] // 2, 200)
+                    # pg.draw.rect(self.screen, 'blue', self.make_frame(letter_rect))
                     self.screen.blit(letter, letter_rect)
+                    # pg.display.flip()
             case 2:
                 letter_rect = alphabet[i][j].get_rect()
                 letter_rect.center = (RES[0] // 2, 200)
@@ -171,7 +179,7 @@ class Game:
         elif self.game_state == 2:
             self.screen.fill('black')
             self.rnd = random.randrange(0, 23)
-            self.level = random.randrange(0, 3)
+            self.level = 1  # random.randrange(0, 3)
 
             self.screen.blit(text1, text1_rect)
 
@@ -179,6 +187,11 @@ class Game:
             self.draw_letter(i, self.level)
 
             self.draw_answers(i, self.level)
+
+            """
+            for k in range(0, 6):
+                pg.draw.rect(self.screen, 'green', pg.Rect(((RES[0] + 100)//6 * (k + 1))-50, 0, 1, RES[1]))
+            """
 
             self.game_state = 1
 
@@ -197,6 +210,7 @@ class Game:
             self.screen.blit(text1, text1_rect)
 
             for a in range(0, 5):
+                pg.draw.rect(self.screen, 'blue', self.answer_map[a][4], 2)
                 self.screen.blit(self.answer_map[a][0], self.answer_map[a][1])
 
             self.game_state = 1
@@ -211,7 +225,7 @@ class Game:
                     if self.game_state == 0:
                         self.game_state = 2
                     elif self.game_state == 1:
-                        is_pressed, button_rect = self.button_clicked([pair[1] for pair in self.answer_map])
+                        is_pressed, button_rect = self.button_clicked([pair[4] for pair in self.answer_map])
                         if is_pressed == 1:
                             if self.is_correct_answer(button_rect) == 1:
                                 self.game_state = 3
@@ -234,17 +248,24 @@ class Game:
         for button in buttons:
             if button[0] <= pos_x <= button[0] + button[2] and button[1] <= pos_y <= button[1] + button[3]:
                 for pair in self.answer_map:
-                    if pair[1] == button:
+                    if pair[4] == button:
                         self.selected = pair[3]
                 return 1, button
         return 0, buttons[0]
 
     def is_correct_answer(self, button):
-        for triple in self.answer_map:
-            rect = triple[1]
+        for triple in self.answer_map:      # TODO: renaming required
+            rect = triple[4]
             if rect == button and triple[2] == 1:
                 return 1
         return 0
+
+    def make_frame(self, rect, width, height):
+        frame_x = rect[0] - 7
+        frame_y = rect[1] - 7
+        frame = pg.Rect(frame_x, frame_y, width + 14, height + 14)
+        frame.center = rect.center
+        return frame
 
     def run(self):
         while True:
