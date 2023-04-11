@@ -1,4 +1,15 @@
 import pygame as pg
+from settings import *
+
+# import game images here
+bicep_left = pg.image.load('sprites/bicep_left.png')
+bicep_right = pg.image.load('sprites/bicep_right.png')
+scaled_bicep_left = pg.transform.scale(bicep_left, (360, 360))
+scaled_bicep_right = pg.transform.scale(bicep_right, (360, 360))
+scaled_bicep_left_rect = scaled_bicep_left.get_rect()
+scaled_bicep_right_rect = scaled_bicep_right.get_rect()
+scaled_bicep_left_rect.center = (RES[0]//2 - 300, RES[1]//2 - 100)
+scaled_bicep_right_rect.center = (RES[0]//2 + 300, RES[1]//2 - 100)
 
 # import images of greek alphabet here
 alpha_l = pg.image.load('sprites/Alpha_lower.png')

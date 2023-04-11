@@ -3,7 +3,7 @@ import os
 import sys
 import random
 
-from letter_images import *
+from images import *
 from settings import *
 
 class Level:

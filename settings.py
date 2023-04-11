@@ -1,4 +1,5 @@
 import pygame as pg
+from images import *
 pg.init()
 
 # game settings
@@ -9,7 +10,7 @@ FPS = 60
 question_font = pg.font.Font('freesansbold.ttf', 64)
 
 # draw answers
-ans_font = pg.font.Font('freesansbold.ttf', 24)
+ans_font = pg.font.Font('freesansbold.ttf', 40)
 font_buttons = pg.font.Font('freesansbold.ttf', 40)
 font_selected_ans = pg.font.Font('freesansbold.ttf', 36)
 text_selected_ans = font_selected_ans.render('You selected:', True, 'black', 'white')
@@ -37,14 +38,23 @@ text_wrong_hdr_rect.center = (RES[0]//2, 100)
 #font_wrong_ans = pg.font.Font('freesansbold.ttf', 36)
 
 # draw
-font_start = pg.font.Font('freesansbold.ttf', 46)
-text_start = font_start.render('Press Mouse Button To Start', True, 'black', 'white')
-text_start_rect = text_start.get_rect()
-text_start_rect.center = (RES[0]//2, RES[1]//2)
+font_start = pg.font.Font('pythia.ttf', 60)
 
-font1 = pg.font.Font('freesansbold.ttf', 32)
+text_start_1 = font_start.render('GREEK', True, 'black', 'white')
+text_start_1_rect = text_start_1.get_rect()
+text_start_1_rect.center = (RES[0]//2, RES[1]//8)
+
+text_start_2 = font_start.render('ALPHABET', True, 'black', 'white')
+text_start_2_rect = text_start_2.get_rect()
+text_start_2_rect.center = (RES[0]//2, RES[1]//8 + 100)
+
+text_start_3 = font_start.render('TRAINER', True, 'black', 'white')
+text_start_3_rect = text_start_3.get_rect()
+text_start_3_rect.center = (RES[0]//2, RES[1]//8 + 200)
+
+font1 = pg.font.Font('freesansbold.ttf', 52)
 text1 = font1.render('Which letter is this?', True, 'black', 'white')
 text1_rect = text1.get_rect()
-text1_rect.center = (RES[0]//2, 50)
+text1_rect.center = (RES[0]//2, (RES[1] // 7) * 1)
 
 

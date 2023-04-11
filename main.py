@@ -3,7 +3,7 @@ import os
 import sys
 import random
 
-from letter_images import *
+from images import *
 from settings import *
 
 
@@ -150,26 +150,26 @@ class Game:
             case 0:
                 if k == 0:
                     letter_rect = alphabet[i][1].get_rect()
-                    letter_rect.center = (RES[0] // 2, 200)
+                    letter_rect.center = (RES[0] // 2, (RES[1] // 5) * 2)
                     self.screen.blit(alphabet[i][1], letter_rect)
                 else:
                     letter = ans_font.render(alphabet[i][2], True, 'black', 'white')
                     letter_rect = letter.get_rect()
-                    letter_rect.center = (RES[0] // 2, 200)
+                    letter_rect.center = (RES[0] // 2,  (RES[1] // 5) * 2)
                     self.screen.blit(letter, letter_rect)
             case 1:
                 if k == 0:
                     letter_rect = alphabet[i][0].get_rect()
-                    letter_rect.center = (RES[0] // 2, 200)
+                    letter_rect.center = (RES[0] // 2, (RES[1] // 5) * 2)
                     self.screen.blit(alphabet[i][0], letter_rect)
                 else:
                     letter = question_font.render(alphabet[i][2], True, 'black', 'white')
                     letter_rect = letter.get_rect()
-                    letter_rect.center = (RES[0] // 2, 200)
+                    letter_rect.center = (RES[0] // 2,  (RES[1] // 5) * 2)
                     self.screen.blit(letter, letter_rect)
             case 2:
                 letter_rect = alphabet[i][j].get_rect()
-                letter_rect.center = (RES[0] // 2, 200)
+                letter_rect.center = (RES[0] // 2,  (RES[1] // 5) * 2)
                 self.screen.blit(alphabet[i][j], letter_rect)
             case _:
                 pass
@@ -178,7 +178,16 @@ class Game:
 
         if self.game_state == 0:
             self.screen.fill('white')
-            self.screen.blit(text_start, text_start_rect)
+
+            self.screen.blit(scaled_bicep_left, scaled_bicep_left_rect)
+            self.screen.blit(scaled_bicep_right, scaled_bicep_right_rect)
+            #bicep_left_rect.center = (RES[0]//2 - 300, RES[1]//2)
+            #bicep_right_rect.center = (RES[0]//2 + 300, RES[1]//2)
+            #self.screen.blit(bicep_left, bicep_left_rect)
+            #self.screen.blit(bicep_right, bicep_right_rect)
+            self.screen.blit(text_start_1, text_start_1_rect)
+            self.screen.blit(text_start_2, text_start_2_rect)
+            self.screen.blit(text_start_3, text_start_3_rect)
 
         elif self.game_state == 1:
             pass
