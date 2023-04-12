@@ -61,7 +61,7 @@ class Game:
 
         correct_ans_index = answers.index(i)
 
-        for a in range(0, 5):                   # TODO: simplify by making button size universal
+        for a in range(0, 5):  # TODO: simplify by making button size universal
             self.answer_pair = [0, 0, 0, 0, 0]
             if lvl == 2:
                 self.answer_pair[0] = ans_font.render(alphabet[answers[a]][2], True, 'black', 'white')
@@ -69,14 +69,18 @@ class Game:
                 self.answer_pair[0] = alphabet[answers[a]][lvl]
             self.answer_pair[1] = self.answer_pair[0].get_rect()
             self.answer_pair[3] = alphabet[answers[a]][2]
-            self.answer_pair[1].center = ((((RES[0] + 100) // 6) * (a + 1)) - 50, (RES[1] // 4) * 3)
+            self.answer_pair[1].center = ((((RES[0] + 100) // 6) * (a + 1)) - 50, (RES[1] // 16) * 13)
 
+            """
             if lvl == 0:
                 self.answer_pair[4] = self.make_frame(self.answer_pair[1], 156, 136)
             elif lvl == 1:
                 self.answer_pair[4] = self.make_frame(self.answer_pair[1], 128, 176)
             elif lvl == 2:
                 self.answer_pair[4] = self.make_frame(self.answer_pair[1], 159, 42)
+            """
+
+            self.answer_pair[4] = self.make_frame(self.answer_pair[1], 159, 176)
 
             if a == correct_ans_index:
                 self.answer_pair[2] = 1
@@ -90,20 +94,21 @@ class Game:
 
     def draw_correct_answer(self):
         self.active_state = [0, 0, 0, 1, 0, 0]
+        self.state_3_buttons = []
         self.screen.fill('white')
         button_pair = [0, 0, 0]
 
         text_correct_ans = font_correct_ans.render(alphabet[self.rnd][2], True, 'black', 'white')
         text_correct_ans_rect = text_correct_ans.get_rect()
-        text_correct_ans_rect.center = (RES[0]//2, 200)
+        text_correct_ans_rect.center = (RES[0] // 2, 200)
 
         selected = font_selected_ans.render(self.selected, True, 'black', 'green')
         selected_rect = selected.get_rect()
-        selected_rect.center = (RES[0]//2 + 100, 400)
+        selected_rect.center = (RES[0] // 2 + 100, 400)
 
         button_pair[0] = font_buttons.render('NEXT', True, 'black', 'white')
         button_pair[1] = button_pair[0].get_rect()
-        button_pair[1].center = (RES[0]//2 + 100, 500)
+        button_pair[1].center = (RES[0] // 2 + 100, 500)
         button_pair[2] = self.make_frame(button_pair[1], 120, 50)
 
         self.state_3_buttons.append(button_pair)
@@ -119,6 +124,7 @@ class Game:
 
     def draw_wrong_answer(self):
         self.active_state = [0, 0, 0, 0, 1, 0]
+        self.state_4_buttons = []
         self.screen.fill('white')
         button_pair = [0, 0, 0]
 
@@ -128,7 +134,7 @@ class Game:
 
         button_pair[0] = font_buttons.render('RETRY', True, 'black', 'white')
         button_pair[1] = button_pair[0].get_rect()
-        button_pair[1].center = (RES[0]//2, 500)
+        button_pair[1].center = (RES[0] // 2, 500)
         button_pair[2] = self.make_frame(button_pair[1], 150, 50)
 
         self.state_4_buttons.append(button_pair)
@@ -157,32 +163,40 @@ class Game:
         match lvl:
             case 0:
                 self.screen.blit(level_0_text_1, level_0_text_1_rect)
-                self.screen.blit(level_0_text_2, level_0_text_2_rect)
                 if k == 0:
                     letter_rect = alphabet[i][1].get_rect()
-                    letter_rect.center = (RES[0] // 2, (RES[1] // 5) * 2)
+                    letter_rect.center = (RES[0] // 2, (RES[1] // 6) * 2)
                     self.screen.blit(alphabet[i][1], letter_rect)
                 else:
                     letter = ans_font.render(alphabet[i][2], True, 'black', 'white')
                     letter_rect = letter.get_rect()
-                    letter_rect.center = (RES[0] // 2,  (RES[1] // 5) * 2)
+                    letter_rect.center = (RES[0] // 2, (RES[1] // 6) * 2)
                     self.screen.blit(letter, letter_rect)
+
+                self.screen.blit(level_0_text_2, level_0_text_2_rect)
+
             case 1:
+                temp = pg.Rect(0, 0, 159, 176)
+                temp.center = (RES[0] // 2, (RES[1] // 6) * 2)
+
+                pg.draw.rect(self.screen, 'green', temp)
                 self.screen.blit(level_1_text_1, level_1_text_1_rect)
-                self.screen.blit(level_1_text_2, level_1_text_2_rect)
                 if k == 0:
                     letter_rect = alphabet[i][0].get_rect()
-                    letter_rect.center = (RES[0] // 2, (RES[1] // 5) * 2)
+                    letter_rect.center = (RES[0] // 2, (RES[1] // 6) * 2)
                     self.screen.blit(alphabet[i][0], letter_rect)
                 else:
                     letter = question_font_3.render(alphabet[i][2], True, 'black', 'white')
                     letter_rect = letter.get_rect()
-                    letter_rect.center = (RES[0] // 2,  (RES[1] // 5) * 2)
+                    letter_rect.center = (RES[0] // 2, (RES[1] // 6) * 2)
                     self.screen.blit(letter, letter_rect)
+
+                self.screen.blit(level_1_text_2, level_1_text_2_rect)
+
             case 2:
                 self.screen.blit(level_2_text_1, level_2_text_1_rect)
                 letter_rect = alphabet[i][j].get_rect()
-                letter_rect.center = (RES[0] // 2,  ((RES[1] // 5) * 2) - 50)
+                letter_rect.center = (RES[0] // 2, ((RES[1] // 5) * 2) - 50)
                 self.screen.blit(alphabet[i][j], letter_rect)
             case _:
                 pass
@@ -192,8 +206,8 @@ class Game:
         self.screen.fill('white')
 
         start_frame = self.make_frame(text_start_button_rect, 200, 40)  # text_start_button_rect[2] <- use this to make the frame the same width as the button
-        score_frame = self.make_frame(text_score_button_rect, 200, 40)    #text_score_button_rect[2]
-        exit_frame = self.make_frame(text_exit_button_rect, 200, 40)    #text_exit_button_rect[2]
+        score_frame = self.make_frame(text_score_button_rect, 200, 40)  # text_score_button_rect[2]
+        exit_frame = self.make_frame(text_exit_button_rect, 200, 40)  # text_exit_button_rect[2]
 
         self.state_0_buttons.append([text_start_button, text_start_button_rect, start_frame])
         self.state_0_buttons.append([text_score_button, text_score_button_rect, score_frame])
@@ -217,15 +231,12 @@ class Game:
     def draw_game_screen(self):
         self.active_state = [0, 0, 1, 0, 0, 0]
         self.screen.fill('white')
-        self.rnd = random.randrange(0, 230) % 10
-        self.level = random.randrange(0, 3)
+        self.rnd = random.randrange(0, 23)
+        self.level = 2  # random.randrange(0, 3)
 
-        # self.screen.blit(text1, text1_rect)  # TODO: change to according to level
+        self.draw_level(self.rnd, self.level)
 
-        i = self.rnd
-        self.draw_level(i, self.level)
-
-        self.draw_answers(i, self.level)
+        self.draw_answers(self.rnd, self.level)
 
     def draw_retry_screen(self):
         self.active_state = [0, 0, 1, 0, 0, 0]

@@ -22,14 +22,14 @@ level_2_text_1 = question_font_1.render('Which letter is this?', True, 'black', 
 level_2_text_2 = question_font_2.render('is...', True, 'black', 'white')
 
 level_0_text_1_rect = level_0_text_1.get_rect()
-level_0_text_1_rect.center = (RES[0]//2, (RES[1] // 7) * 1)
+level_0_text_1_rect.center = (RES[0]//2, (RES[1] // 9) * 1)
 level_0_text_2_rect = level_0_text_2.get_rect()
-level_0_text_2_rect.center = (RES[0]//2, RES[1] // 2)
+level_0_text_2_rect.center = (RES[0]//2, (RES[1] // 9) * 5)
 
 level_1_text_1_rect = level_1_text_1.get_rect()
-level_1_text_1_rect.center = (RES[0]//2, (RES[1] // 7) * 1)
+level_1_text_1_rect.center = (RES[0]//2, (RES[1] // 9) * 1)
 level_1_text_2_rect = level_1_text_2.get_rect()
-level_1_text_2_rect.center = (RES[0]//2, RES[1] // 2)
+level_1_text_2_rect.center = (RES[0]//2, (RES[1] // 9) * 5)
 
 level_2_text_1_rect = level_2_text_1.get_rect()
 level_2_text_1_rect.center = (RES[0]//2, (RES[1] // 7) * 1)
