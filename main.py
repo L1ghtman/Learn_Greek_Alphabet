@@ -39,7 +39,7 @@ class Game:
         level == 1 => draw uppercase symbol or name, ask for lowercase symbol
         level == 2 => draw symbol (lowercase or uppercase), ask for name
         """
-        self.level = 2
+        self.level = 0
 
     def new_game(self):
         pass
@@ -61,7 +61,7 @@ class Game:
 
         correct_ans_index = answers.index(i)
 
-        for a in range(0, 5):
+        for a in range(0, 5):                   # TODO: simplify by making button size universal
             self.answer_pair = [0, 0, 0, 0, 0]
             if lvl == 2:
                 self.answer_pair[0] = ans_font.render(alphabet[answers[a]][2], True, 'black', 'white')
@@ -141,7 +141,7 @@ class Game:
         self.screen.blit(self.state_4_buttons[0][0], self.state_4_buttons[0][1])
         pg.draw.rect(self.screen, 'black', self.state_4_buttons[0][2], 2)
 
-    def draw_letter(self, i, lvl):
+    def draw_level(self, i, lvl):
         print(f'level: {lvl}')
         if self.is_retry == 1:
             self.is_retry = 0
@@ -156,6 +156,8 @@ class Game:
         print(f'j: {j}')
         match lvl:
             case 0:
+                self.screen.blit(level_0_text_1, level_0_text_1_rect)
+                self.screen.blit(level_0_text_2, level_0_text_2_rect)
                 if k == 0:
                     letter_rect = alphabet[i][1].get_rect()
                     letter_rect.center = (RES[0] // 2, (RES[1] // 5) * 2)
@@ -166,18 +168,21 @@ class Game:
                     letter_rect.center = (RES[0] // 2,  (RES[1] // 5) * 2)
                     self.screen.blit(letter, letter_rect)
             case 1:
+                self.screen.blit(level_1_text_1, level_1_text_1_rect)
+                self.screen.blit(level_1_text_2, level_1_text_2_rect)
                 if k == 0:
                     letter_rect = alphabet[i][0].get_rect()
                     letter_rect.center = (RES[0] // 2, (RES[1] // 5) * 2)
                     self.screen.blit(alphabet[i][0], letter_rect)
                 else:
-                    letter = question_font.render(alphabet[i][2], True, 'black', 'white')
+                    letter = question_font_3.render(alphabet[i][2], True, 'black', 'white')
                     letter_rect = letter.get_rect()
                     letter_rect.center = (RES[0] // 2,  (RES[1] // 5) * 2)
                     self.screen.blit(letter, letter_rect)
             case 2:
+                self.screen.blit(level_2_text_1, level_2_text_1_rect)
                 letter_rect = alphabet[i][j].get_rect()
-                letter_rect.center = (RES[0] // 2,  (RES[1] // 5) * 2)
+                letter_rect.center = (RES[0] // 2,  ((RES[1] // 5) * 2) - 50)
                 self.screen.blit(alphabet[i][j], letter_rect)
             case _:
                 pass
@@ -215,10 +220,10 @@ class Game:
         self.rnd = random.randrange(0, 230) % 10
         self.level = random.randrange(0, 3)
 
-        self.screen.blit(text1, text1_rect)  # TODO: change to according to level
+        # self.screen.blit(text1, text1_rect)  # TODO: change to according to level
 
         i = self.rnd
-        self.draw_letter(i, self.level)
+        self.draw_level(i, self.level)
 
         self.draw_answers(i, self.level)
 
@@ -227,9 +232,9 @@ class Game:
         self.screen.fill('white')
         i = self.rnd
 
-        self.draw_letter(i, self.level)
+        self.draw_level(i, self.level)
 
-        self.screen.blit(text1, text1_rect)
+        # self.screen.blit(text1, text1_rect)
 
         for a in range(0, 5):
             pg.draw.rect(self.screen, 'black', self.answer_map[a][4], 2)

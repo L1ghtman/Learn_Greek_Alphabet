@@ -6,8 +6,35 @@ pg.init()
 RES = WIDTH, HEIGHT = 1000, 600
 FPS = 60
 
-# draw question
-question_font = pg.font.Font('freesansbold.ttf', 64)
+# draw level
+question_font_1 = pg.font.Font('freesansbold.ttf', 44)
+question_font_2 = pg.font.Font('freesansbold.ttf', 34)
+question_font_3 = pg.font.Font('freesansbold.ttf', 54)
+
+
+level_0_text_1 = question_font_1.render('The uppercase symbol for...', True, 'black', 'white')
+level_0_text_2 = question_font_2.render('is...', True, 'black', 'white')
+
+level_1_text_1 = question_font_1.render('The lowercase symbol for...', True, 'black', 'white')
+level_1_text_2 = question_font_2.render('is...', True, 'black', 'white')
+
+level_2_text_1 = question_font_1.render('Which letter is this?', True, 'black', 'white')
+level_2_text_2 = question_font_2.render('is...', True, 'black', 'white')
+
+level_0_text_1_rect = level_0_text_1.get_rect()
+level_0_text_1_rect.center = (RES[0]//2, (RES[1] // 7) * 1)
+level_0_text_2_rect = level_0_text_2.get_rect()
+level_0_text_2_rect.center = (RES[0]//2, RES[1] // 2)
+
+level_1_text_1_rect = level_1_text_1.get_rect()
+level_1_text_1_rect.center = (RES[0]//2, (RES[1] // 7) * 1)
+level_1_text_2_rect = level_1_text_2.get_rect()
+level_1_text_2_rect.center = (RES[0]//2, RES[1] // 2)
+
+level_2_text_1_rect = level_2_text_1.get_rect()
+level_2_text_1_rect.center = (RES[0]//2, (RES[1] // 7) * 1)
+level_2_text_2_rect = level_2_text_2.get_rect()
+level_2_text_2_rect.center = (RES[0]//2, RES[1] // 2)
 
 # draw answers
 ans_font = pg.font.Font('freesansbold.ttf', 40)
@@ -37,8 +64,9 @@ text_wrong_hdr_rect.center = (RES[0]//2, 100)
 
 #font_wrong_ans = pg.font.Font('freesansbold.ttf', 36)
 
-# draw
+# draw start screen
 font_start = pg.font.Font('pythia.ttf', 60)
+button_font = pg.font.Font('pythia.ttf', 40)
 
 text_start_1 = font_start.render('GREEK', True, 'black', 'white')
 text_start_1_rect = text_start_1.get_rect()
@@ -52,9 +80,22 @@ text_start_3 = font_start.render('TRAINER', True, 'black', 'white')
 text_start_3_rect = text_start_3.get_rect()
 text_start_3_rect.center = (RES[0]//2, RES[1]//8 + 200)
 
+text_start_button = button_font.render('START', True, 'black', 'white')
+text_start_button_rect = text_start_button.get_rect()
+text_start_button_rect.center = (RES[0]//2, (RES[1]//3 * 2))
+
+text_score_button = button_font.render('SCORE', True, 'black', 'white')
+text_score_button_rect = text_score_button.get_rect()
+text_score_button_rect.center = (RES[0]//2, ((RES[1]//3) * 2) + 60)
+
+text_exit_button = button_font.render('EXIT', True, 'black', 'white')
+text_exit_button_rect = text_exit_button.get_rect()
+text_exit_button_rect.center = (RES[0]//2, (RES[1]//3 * 2) + 120)
+
+start_buttons = [text_start_button, text_score_button, text_exit_button]
+
+# draw
 font1 = pg.font.Font('freesansbold.ttf', 52)
-text1 = font1.render('Which letter is this?', True, 'black', 'white')
-text1_rect = text1.get_rect()
-text1_rect.center = (RES[0]//2, (RES[1] // 7) * 1)
+
 
 
