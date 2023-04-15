@@ -158,8 +158,8 @@ class Game:
             j = random.randrange(0, 23) % 2
             self.retry_pos[0] = k
             self.retry_pos[1] = j
-        print(f'k: {k}')
-        print(f'j: {j}')
+        # print(f'k: {k}')
+        # print(f'j: {j}')
         match lvl:
             case 0:
                 self.screen.blit(level_0_text_1, level_0_text_1_rect)
@@ -179,7 +179,7 @@ class Game:
                 temp = pg.Rect(0, 0, 159, 176)
                 temp.center = (RES[0] // 2, (RES[1] // 6) * 2)
 
-                pg.draw.rect(self.screen, 'green', temp)
+                #pg.draw.rect(self.screen, 'green', temp)
                 self.screen.blit(level_1_text_1, level_1_text_1_rect)
                 if k == 0:
                     letter_rect = alphabet[i][0].get_rect()
@@ -232,7 +232,7 @@ class Game:
         self.active_state = [0, 0, 1, 0, 0, 0]
         self.screen.fill('white')
         self.rnd = random.randrange(0, 23)
-        self.level = 2  # random.randrange(0, 3)
+        self.level = random.randrange(0, 3)
 
         self.draw_level(self.rnd, self.level)
 
@@ -259,34 +259,52 @@ class Game:
             if self.active_state[0]:
                 pass
             else:
+                print(f'game state: {self.game_state}')
+                print(f'active state befor: {self.active_state}')
                 self.draw_start_screen()
+                print(f'active state after: {self.active_state}')
 
         elif self.game_state == 1:  # is this needed?
+            print(f'game state: {self.game_state}')
+            print(f'active state befor: {self.active_state}')
             pass
+            print(f'active state after: {self.active_state}')
 
-        elif self.game_state == 2:
+        elif self.game_state == 2:  # TODO: try moving 'retry' here
             if self.active_state[2]:
                 pass
             else:
+                print(f'game state: {self.game_state}')
+                print(f'active state befor: {self.active_state}')
                 self.draw_game_screen()
+                print(f'active state after: {self.active_state}')
 
         elif self.game_state == 3:
             if self.active_state[3]:
                 pass
             else:
+                print(f'game state: {self.game_state}')
+                print(f'active state befor: {self.active_state}')
                 self.draw_correct_answer()
+                print(f'active state after: {self.active_state}')
 
         elif self.game_state == 4:
             if self.active_state[4]:
                 pass
             else:
+                print(f'game state: {self.game_state}')
+                print(f'active state befor: {self.active_state}')
                 self.draw_wrong_answer()
+                print(f'active state after: {self.active_state}')
 
         elif self.game_state == 5:
             if self.active_state[5]:
                 pass
             else:
+                print(f'game state: {self.game_state}')
+                print(f'active state befor: {self.active_state}')
                 self.draw_retry_screen()
+                print(f'active state after: {self.active_state}')
 
     def check_events(self):
         for event in pg.event.get():
@@ -305,7 +323,7 @@ class Game:
                             elif button_rect == self.state_0_buttons[2][2]:
                                 pg.quit()
                                 sys.exit()
-                    elif self.game_state == 2:  # originally was 1
+                    elif self.game_state == 2:  # originally was 1 TODO: change to game state 1 eventually
                         is_pressed, button_rect = self.button_clicked([pair[4] for pair in self.answer_map])
                         if is_pressed == 1:
                             if self.is_correct_answer(button_rect) == 1:
@@ -313,7 +331,7 @@ class Game:
                             else:
                                 self.game_state = 4
                         else:
-                            self.game_state = 1
+                            self.game_state = 2
                     elif self.game_state == 3:
                         is_pressed, button_rect = self.button_clicked([pair[2] for pair in self.state_3_buttons])
                         if is_pressed == 1:
