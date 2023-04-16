@@ -16,7 +16,7 @@ class Game:
         self.game_state = 0
 
         self.answer_map = []
-        self.answer_pair = []   # [render, rect, is_correct, text] => outdated
+        self.answer_pair = []   # [render, rect, is_correct, text, frame]
 
         self.state_0_buttons = []
         self.state_3_buttons = []
@@ -26,12 +26,15 @@ class Game:
 
         self.rnd = 0
 
-        self.selected = 0
+        self.selected = []
         self.correct = 0
 
         self.prev_round = 0
         self.is_retry = 0
         self.retry_pos = [0, 0]
+
+        self.score = 0
+        self.streak = 0
 
         """
         levels:
@@ -98,27 +101,34 @@ class Game:
         self.screen.fill('white')
         button_pair = [0, 0, 0]
 
-        text_correct_ans = font_correct_ans.render(alphabet[self.rnd][2], True, 'black', 'white')
-        text_correct_ans_rect = text_correct_ans.get_rect()
-        text_correct_ans_rect.center = (RES[0] // 2, 200)
+        if self.level == 0 or self.level == 1:
+            image_sel_rect = self.selected[1]
+            image_sel_rect.center = (RES[0] // 2, RES[1] // 4)
+            self.screen.blit(self.selected[0], image_sel_rect)
+        elif self.level == 2:
+            text_correct = font_correct_ans.render(self.selected[3], True, 'black', 'white')
+            text_correct_rect = text_correct.get_rect()
+            text_correct_rect.center = (RES[0] // 2, RES[1] // 4)
+            self.screen.blit(text_correct, text_correct_rect)
 
-        selected = font_selected_ans.render(self.selected, True, 'black', 'green')
-        selected_rect = selected.get_rect()
-        selected_rect.center = (RES[0] // 2 + 100, 400)
-
+        # create 'next' button
         button_pair[0] = font_buttons.render('NEXT', True, 'black', 'white')
         button_pair[1] = button_pair[0].get_rect()
-        button_pair[1].center = (RES[0] // 2 + 100, 500)
+        button_pair[1].center = (RES[0] // 2, 500)
         button_pair[2] = self.make_frame(button_pair[1], 120, 50)
 
+        # add buttons to list that will be used in check_events()
         self.state_3_buttons.append(button_pair)
-        print(self.state_3_buttons)
 
-        self.screen.blit(text_correct_hdr, text_correct_hdr_rect)
-        self.screen.blit(text_correct_ans, text_correct_ans_rect)
-        self.screen.blit(text_selected_ans, text_selected_ans_rect)
-        self.screen.blit(selected, selected_rect)
-        self.screen.blit(text_compliment, text_compliment_rect)
+        # draw score and streak
+        self.screen.blit(text_score, text_score_rect)
+        self.screen.blit(text_streak, text_streak_rect)
+
+        # draw additional text
+        self.screen.blit(text_correct_ans, text_cor_ans_rect)
+        self.screen.blit(text_well_done, text_well_done_rect)
+
+        # draw button text and frame
         self.screen.blit(self.state_3_buttons[0][0], self.state_3_buttons[0][1])
         pg.draw.rect(self.screen, 'black', self.state_3_buttons[0][2], 2)
 
@@ -128,9 +138,15 @@ class Game:
         self.screen.fill('white')
         button_pair = [0, 0, 0]
 
-        selected = font_selected_ans.render(self.selected, True, 'black', 'red')
-        selected_rect = selected.get_rect()
-        selected_rect.center = (RES[0] // 2 + 100, 400)
+        if self.level == 0 or self.level == 1:
+            image_sel_rect = self.selected[1]
+            image_sel_rect.center = (RES[0] // 2, RES[1] // 4)
+            self.screen.blit(self.selected[0], image_sel_rect)
+        elif self.level == 2:
+            text_wrong = font_wrong_ans.render(self.selected[3], True, 'black', 'white')
+            text_wrong_rect = text_wrong.get_rect()
+            text_wrong_rect.center = (RES[0] // 2,  RES[1] // 4)
+            self.screen.blit(text_wrong, text_wrong_rect)
 
         button_pair[0] = font_buttons.render('RETRY', True, 'black', 'white')
         button_pair[1] = button_pair[0].get_rect()
@@ -139,16 +155,15 @@ class Game:
 
         self.state_4_buttons.append(button_pair)
 
-        print(self.state_4_buttons)
+        # print(self.state_4_buttons)
 
         self.screen.blit(text_wrong_hdr, text_wrong_hdr_rect)
-        self.screen.blit(text_selected_ans, text_selected_ans_rect)
-        self.screen.blit(selected, selected_rect)
+        self.screen.blit(text_wrong_ans, text_wrong_ans_rect)
         self.screen.blit(self.state_4_buttons[0][0], self.state_4_buttons[0][1])
         pg.draw.rect(self.screen, 'black', self.state_4_buttons[0][2], 2)
 
     def draw_level(self, i, lvl):
-        print(f'level: {lvl}')
+        # print(f'level: {lvl}')
         if self.is_retry == 1:
             self.is_retry = 0
             k = self.retry_pos[0]
@@ -213,7 +228,7 @@ class Game:
         self.state_0_buttons.append([text_score_button, text_score_button_rect, score_frame])
         self.state_0_buttons.append([text_exit_button, text_exit_button_rect, exit_frame])
 
-        print(self.state_0_buttons)
+        # print(self.state_0_buttons)
 
         self.screen.blit(scaled_bicep_left, scaled_bicep_left_rect)
         self.screen.blit(scaled_bicep_right, scaled_bicep_right_rect)
@@ -259,52 +274,34 @@ class Game:
             if self.active_state[0]:
                 pass
             else:
-                print(f'game state: {self.game_state}')
-                print(f'active state befor: {self.active_state}')
                 self.draw_start_screen()
-                print(f'active state after: {self.active_state}')
 
         elif self.game_state == 1:  # is this needed?
-            print(f'game state: {self.game_state}')
-            print(f'active state befor: {self.active_state}')
             pass
-            print(f'active state after: {self.active_state}')
 
         elif self.game_state == 2:  # TODO: try moving 'retry' here
             if self.active_state[2]:
                 pass
             else:
-                print(f'game state: {self.game_state}')
-                print(f'active state befor: {self.active_state}')
                 self.draw_game_screen()
-                print(f'active state after: {self.active_state}')
 
         elif self.game_state == 3:
             if self.active_state[3]:
                 pass
             else:
-                print(f'game state: {self.game_state}')
-                print(f'active state befor: {self.active_state}')
                 self.draw_correct_answer()
-                print(f'active state after: {self.active_state}')
 
         elif self.game_state == 4:
             if self.active_state[4]:
                 pass
             else:
-                print(f'game state: {self.game_state}')
-                print(f'active state befor: {self.active_state}')
                 self.draw_wrong_answer()
-                print(f'active state after: {self.active_state}')
 
         elif self.game_state == 5:
             if self.active_state[5]:
                 pass
             else:
-                print(f'game state: {self.game_state}')
-                print(f'active state befor: {self.active_state}')
                 self.draw_retry_screen()
-                print(f'active state after: {self.active_state}')
 
     def check_events(self):
         for event in pg.event.get():
@@ -348,7 +345,7 @@ class Game:
             if button[0] <= pos_x <= button[0] + button[2] and button[1] <= pos_y <= button[1] + button[3]:
                 for pair in self.answer_map:
                     if pair[4] == button:
-                        self.selected = pair[3]
+                        self.selected = pair
                 return 1, button
         return 0, buttons[0]
 

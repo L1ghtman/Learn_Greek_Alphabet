@@ -4,12 +4,14 @@ pg.init()
 
 # game settings
 RES = WIDTH, HEIGHT = 1000, 600
+FRAME_DIM = 159, 176
 FPS = 60
 
 # draw level
 question_font_1 = pg.font.Font('freesansbold.ttf', 44)
 question_font_2 = pg.font.Font('freesansbold.ttf', 34)
 question_font_3 = pg.font.Font('freesansbold.ttf', 54)
+font_score = pg.font.Font('freesansbold.ttf', 30)
 
 
 level_0_text_1 = question_font_1.render('The uppercase symbol for...', True, 'black', 'white')
@@ -20,6 +22,9 @@ level_1_text_2 = question_font_2.render('is...', True, 'black', 'white')
 
 level_2_text_1 = question_font_1.render('Which letter is this?', True, 'black', 'white')
 level_2_text_2 = question_font_2.render('is...', True, 'black', 'white')
+
+text_score = font_score.render('SCORE: ', True, 'black', 'white')
+text_streak = font_score.render('STREAK: ', True, 'black', 'white')
 
 level_0_text_1_rect = level_0_text_1.get_rect()
 level_0_text_1_rect.center = (RES[0]//2, (RES[1] // 9) * 1)
@@ -36,33 +41,40 @@ level_2_text_1_rect.center = (RES[0]//2, (RES[1] // 7) * 1)
 level_2_text_2_rect = level_2_text_2.get_rect()
 level_2_text_2_rect.center = (RES[0]//2, RES[1] // 2)
 
+text_score_rect = pg.Rect(0, 0, 100, 30)
+text_streak_rect = pg.Rect(0, 30, 100, 30)
+
 # draw answers
 ans_font = pg.font.Font('freesansbold.ttf', 40)
 font_buttons = pg.font.Font('freesansbold.ttf', 40)
-font_selected_ans = pg.font.Font('freesansbold.ttf', 36)
-text_selected_ans = font_selected_ans.render('You selected:', True, 'black', 'white')
-text_selected_ans_rect = text_selected_ans.get_rect()
-text_selected_ans_rect.center = (RES[0] // 2 - 100, 400)
+
 
 # draw correct answer
-font_correct_hdr = pg.font.Font('freesansbold.ttf', 46)
-text_correct_hdr = font_correct_hdr.render('The correct answer is:', True, 'black', 'white')
-text_correct_hdr_rect = text_correct_hdr.get_rect()
-text_correct_hdr_rect.center = (RES[0]//2, 100)
-
+font_well_done = pg.font.Font('freesansbold.ttf', 46)
 font_correct_ans = pg.font.Font('freesansbold.ttf', 36)
 
-text_compliment = font_selected_ans.render('Well done!', True, 'black', 'white')
-text_compliment_rect = text_compliment.get_rect()
-text_compliment_rect.center = (RES[0] // 2 - 100, 500)
+text_well_done = font_well_done.render('Well Done', True, 'black', 'white')
+text_correct_ans = font_correct_ans.render('... is correct!', True, 'black', 'white')
+
+text_well_done_rect = text_well_done.get_rect()
+text_cor_ans_rect = text_correct_ans.get_rect()
+
+text_well_done_rect.center = (RES[0]//2, RES[1]//2 + 100)
+text_cor_ans_rect.center = (RES[0]//2, RES[1]//2)
 
 # draw wrong answer
 font_wrong_hdr = pg.font.Font('freesansbold.ttf', 46)
-text_wrong_hdr = font_wrong_hdr.render('Wrong answer :( try again', True, 'black', 'white')
-text_wrong_hdr_rect = text_wrong_hdr.get_rect()
-text_wrong_hdr_rect.center = (RES[0]//2, 100)
+font_wrong_ans = pg.font.Font('freesansbold.ttf', 36)
 
-#font_wrong_ans = pg.font.Font('freesansbold.ttf', 36)
+text_wrong_hdr = font_wrong_hdr.render('Don\'t cry, try again! :)', True, 'black', 'white')
+text_wrong_ans = font_wrong_ans.render('... is wrong :(', True, 'black', 'white')
+
+text_wrong_hdr_rect = text_wrong_hdr.get_rect()
+text_wrong_ans_rect = text_wrong_ans.get_rect()
+
+text_wrong_hdr_rect.center = (RES[0]//2, RES[1]//2 + 100)
+text_wrong_ans_rect.center = (RES[0]//2, RES[1]//2)
+
 
 # draw start screen
 font_start = pg.font.Font('pythia.ttf', 60)
