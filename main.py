@@ -29,7 +29,7 @@ class Game:
         self.selected = []
         self.correct = 0
 
-        self.prev_round = 0
+        self.prev_round = []
         self.is_retry = 0
         self.retry_pos = [0, 0]
 
@@ -54,17 +54,21 @@ class Game:
 
     def draw_answers(self, i, lvl):
         self.answer_map = []
-        indices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
-        indices.remove(i)
-        random.shuffle(indices)
 
-        answers = [indices[0], indices[1], indices[2], indices[3], i]
-        self.prev_round = answers
-        random.shuffle(answers)
+        if self.is_retry == 0:
+            indices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+            indices.remove(i)
+            random.shuffle(indices)
+
+            answers = [indices[0], indices[1], indices[2], indices[3], i]
+            self.prev_round = answers
+            random.shuffle(answers)
+
+        answers = self.prev_round
 
         correct_ans_index = answers.index(i)
 
-        for a in range(0, 5):  # TODO: simplify by making button size universal
+        for a in range(0, 5):
             self.answer_pair = [0, 0, 0, 0, 0]
             if lvl == 2:
                 self.answer_pair[0] = ans_font.render(alphabet[answers[a]][2], True, 'black', 'white')
@@ -73,15 +77,6 @@ class Game:
             self.answer_pair[1] = self.answer_pair[0].get_rect()
             self.answer_pair[3] = alphabet[answers[a]][2]
             self.answer_pair[1].center = ((((RES[0] + 100) // 6) * (a + 1)) - 50, (RES[1] // 16) * 13)
-
-            """
-            if lvl == 0:
-                self.answer_pair[4] = self.make_frame(self.answer_pair[1], 156, 136)
-            elif lvl == 1:
-                self.answer_pair[4] = self.make_frame(self.answer_pair[1], 128, 176)
-            elif lvl == 2:
-                self.answer_pair[4] = self.make_frame(self.answer_pair[1], 159, 42)
-            """
 
             self.answer_pair[4] = self.make_frame(self.answer_pair[1], 159, 176)
 
@@ -165,7 +160,7 @@ class Game:
     def draw_level(self, i, lvl):
         # print(f'level: {lvl}')
         if self.is_retry == 1:
-            self.is_retry = 0
+            # self.is_retry = 0
             k = self.retry_pos[0]
             j = self.retry_pos[1]
         else:
@@ -246,12 +241,17 @@ class Game:
     def draw_game_screen(self):
         self.active_state = [0, 0, 1, 0, 0, 0]
         self.screen.fill('white')
-        self.rnd = random.randrange(0, 23)
-        self.level = random.randrange(0, 3)
+
+        if self.is_retry == 0:
+            self.rnd = random.randrange(0, 23)
+            self.level = random.randrange(0, 3)
 
         self.draw_level(self.rnd, self.level)
 
         self.draw_answers(self.rnd, self.level)
+
+        if self.is_retry == 1:
+            self.is_retry = 0
 
     def draw_retry_screen(self):
         self.active_state = [0, 0, 1, 0, 0, 0]
@@ -301,7 +301,8 @@ class Game:
             if self.active_state[5]:
                 pass
             else:
-                self.draw_retry_screen()
+                # self.draw_retry_screen()
+                self.draw_game_screen()
 
     def check_events(self):
         for event in pg.event.get():
@@ -336,7 +337,7 @@ class Game:
                     elif self.game_state == 4:
                         is_pressed, button_rect = self.button_clicked([pair[2] for pair in self.state_4_buttons])
                         if is_pressed == 1:
-                            self.game_state = 5
+                            self.game_state = 2
                             self.is_retry = 1
 
     def button_clicked(self, buttons):
