@@ -1,4 +1,5 @@
 import pygame as pg
+import matplotlib.pyplot as plt
 import os
 import sys
 import random
@@ -6,12 +7,25 @@ import random
 from images import *
 from settings import *
 
+# general
+# TODO: make sure letters dont repeat in a round
+# TODO: add high score
+# TODO: add exit button to every screen
+# TODO: add lives / game over screen
+# TODO: add sound effects
+# TODO: add music
+# TODO: add game modes (time, lives, etc)
+# TODO: add log for distribution of letters
+# TODO: increase probability of letters that weren't guessed correctly
 
 class Game:
     def __init__(self):
         pg.init()
         self.screen = pg.display.set_mode(RES)
         self.clock = pg.time.Clock()
+
+        # for logging
+        self.dist = [0] * 24
 
         self.game_state = 0
 
@@ -94,7 +108,10 @@ class Game:
         self.active_state = [0, 0, 0, 1, 0, 0]
         self.state_3_buttons = []
         self.screen.fill('white')
+        self.score = self.score + 1
+        self.streak = self.streak + 1
         button_pair = [0, 0, 0]
+
 
         if self.level == 0 or self.level == 1:
             image_sel_rect = self.selected[1]
@@ -115,9 +132,8 @@ class Game:
         # add buttons to list that will be used in check_events()
         self.state_3_buttons.append(button_pair)
 
-        # draw score and streak
-        self.screen.blit(text_score, text_score_rect)
-        self.screen.blit(text_streak, text_streak_rect)
+        # draw score
+        self.draw_score()
 
         # draw additional text
         self.screen.blit(text_correct_ans, text_cor_ans_rect)
@@ -131,6 +147,7 @@ class Game:
         self.active_state = [0, 0, 0, 0, 1, 0]
         self.state_4_buttons = []
         self.screen.fill('white')
+        self.streak = 0
         button_pair = [0, 0, 0]
 
         if self.level == 0 or self.level == 1:
@@ -150,7 +167,8 @@ class Game:
 
         self.state_4_buttons.append(button_pair)
 
-        # print(self.state_4_buttons)
+        # draw score
+        self.draw_score()
 
         self.screen.blit(text_wrong_hdr, text_wrong_hdr_rect)
         self.screen.blit(text_wrong_ans, text_wrong_ans_rect)
@@ -158,9 +176,7 @@ class Game:
         pg.draw.rect(self.screen, 'black', self.state_4_buttons[0][2], 2)
 
     def draw_level(self, i, lvl):
-        # print(f'level: {lvl}')
         if self.is_retry == 1:
-            # self.is_retry = 0
             k = self.retry_pos[0]
             j = self.retry_pos[1]
         else:
@@ -168,8 +184,6 @@ class Game:
             j = random.randrange(0, 23) % 2
             self.retry_pos[0] = k
             self.retry_pos[1] = j
-        # print(f'k: {k}')
-        # print(f'j: {j}')
         match lvl:
             case 0:
                 self.screen.blit(level_0_text_1, level_0_text_1_rect)
@@ -206,10 +220,18 @@ class Game:
             case 2:
                 self.screen.blit(level_2_text_1, level_2_text_1_rect)
                 letter_rect = alphabet[i][j].get_rect()
-                letter_rect.center = (RES[0] // 2, ((RES[1] // 5) * 2) - 50)
+                letter_rect.center = (RES[0] // 2, (RES[1] // 6) * 2)    # (RES[0] // 2, ((RES[1] // 5) * 2) - 50)
                 self.screen.blit(alphabet[i][j], letter_rect)
             case _:
                 pass
+
+    def draw_score(self):
+        text_score = font_score.render('Score: ' + str(self.score), True, 'black', 'white')
+        text_streak = font_score.render('Streak: ' + str(self.streak), True, 'black', 'white')
+
+        # draw score and streak
+        self.screen.blit(text_score, text_score_rect)
+        self.screen.blit(text_streak, text_streak_rect)
 
     def draw_start_screen(self):
         self.active_state = [1, 0, 0, 0, 0, 0]
@@ -242,9 +264,13 @@ class Game:
         self.active_state = [0, 0, 1, 0, 0, 0]
         self.screen.fill('white')
 
+        self.draw_score()
+
         if self.is_retry == 0:
-            self.rnd = random.randrange(0, 23)
+            self.rnd = random.randrange(0, 24)
             self.level = random.randrange(0, 3)
+
+            self.dist[self.rnd] = self.dist[self.rnd] + 1
 
         self.draw_level(self.rnd, self.level)
 
@@ -252,21 +278,6 @@ class Game:
 
         if self.is_retry == 1:
             self.is_retry = 0
-
-    def draw_retry_screen(self):
-        self.active_state = [0, 0, 1, 0, 0, 0]
-        self.screen.fill('white')
-        i = self.rnd
-
-        self.draw_level(i, self.level)
-
-        # self.screen.blit(text1, text1_rect)
-
-        for a in range(0, 5):
-            pg.draw.rect(self.screen, 'black', self.answer_map[a][4], 2)
-            self.screen.blit(self.answer_map[a][0], self.answer_map[a][1])
-
-        self.game_state = 2
 
     def draw(self):
 
@@ -279,7 +290,7 @@ class Game:
         elif self.game_state == 1:  # is this needed?
             pass
 
-        elif self.game_state == 2:  # TODO: try moving 'retry' here
+        elif self.game_state == 2:
             if self.active_state[2]:
                 pass
             else:
@@ -297,16 +308,42 @@ class Game:
             else:
                 self.draw_wrong_answer()
 
-        elif self.game_state == 5:
-            if self.active_state[5]:
-                pass
-            else:
-                # self.draw_retry_screen()
-                self.draw_game_screen()
+    def add_to_log(self):
+        print(self.dist)
+        log_list = []
+        log = open('distribution_log.txt', 'r')
+        log_lines = log.readline().split(',')
+        log.close()
+        if len(log_lines) > 1:
+            for i in range(0, 24):
+                self.dist[i] = self.dist[i] + int(log_lines[i])
+                log_list.append(str(self.dist[i]))
+        else:
+            for i in range(0, 24):
+                log_list.append(str(self.dist[i]))
+        log = open('distribution_log.txt', 'w')
+        print(log_list)
+        log.write(','.join(log_list))
+        log.close()
+
+    def plot_distribution(self):
+        log = open('distribution_log.txt', 'r')
+        log_lines = [int(i) for i in log.readline().split(',')]
+        log.close()
+
+        fig = plt.figure()
+        ax = fig.add_axes([0, 0, 1, 1])
+        letters = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+        distribution = log_lines
+        ax.bar(letters, distribution)
+        plt.show()
+
 
     def check_events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE):
+                self.add_to_log()
+                self.plot_distribution()
                 pg.quit()
                 sys.exit()
             elif event.type == pg.MOUSEBUTTONDOWN:
@@ -319,6 +356,8 @@ class Game:
                             elif button_rect == self.state_0_buttons[1][2]:
                                 pass
                             elif button_rect == self.state_0_buttons[2][2]:
+                                self.add_to_log()
+                                self.plot_distribution()
                                 pg.quit()
                                 sys.exit()
                     elif self.game_state == 2:  # originally was 1 TODO: change to game state 1 eventually
