@@ -14,8 +14,7 @@ from settings import *
 # TODO: add lives / game over screen
 # TODO: add sound effects
 # TODO: add music
-# TODO: add game modes (time, lives, etc)
-# TODO: add log for distribution of letters
+# TODO: add game modes (time, lives, spoken etc)
 # TODO: increase probability of letters that weren't guessed correctly
 
 class Game:
@@ -33,6 +32,7 @@ class Game:
         self.answer_pair = []   # [render, rect, is_correct, text, frame]
 
         self.state_0_buttons = []
+        self.state_1_buttons = []
         self.state_3_buttons = []
         self.state_4_buttons = []
 
@@ -49,6 +49,7 @@ class Game:
 
         self.score = 0
         self.streak = 0
+        self.lives = 3
 
         """
         levels:
@@ -112,6 +113,7 @@ class Game:
         self.streak = self.streak + 1
         button_pair = [0, 0, 0]
 
+        self.draw_lives(self.lives)
 
         if self.level == 0 or self.level == 1:
             image_sel_rect = self.selected[1]
@@ -149,6 +151,8 @@ class Game:
         self.screen.fill('white')
         self.streak = 0
         button_pair = [0, 0, 0]
+
+        self.draw_lives(self.lives)
 
         if self.level == 0 or self.level == 1:
             image_sel_rect = self.selected[1]
@@ -226,8 +230,19 @@ class Game:
                 pass
 
     def draw_score(self):
+        # set score and streak text
         text_score = font_score.render('Score: ' + str(self.score), True, 'black', 'white')
         text_streak = font_score.render('Streak: ' + str(self.streak), True, 'black', 'white')
+
+        # set location of score and streak
+        if self.game_state == 1:
+            text_score_rect = text_score.get_rect()
+            text_streak_rect = text_streak.get_rect()
+            text_score_rect.center = (RES[0] // 2, RES[1] // 2 - 50)
+            text_streak_rect.center = (RES[0] // 2, RES[1] // 2)
+        else:
+            text_score_rect = pg.Rect(0, 0, 100, 30)
+            text_streak_rect = pg.Rect(0, 30, 100, 30)
 
         # draw score and streak
         self.screen.blit(text_score, text_score_rect)
@@ -244,8 +259,6 @@ class Game:
         self.state_0_buttons.append([text_start_button, text_start_button_rect, start_frame])
         self.state_0_buttons.append([text_score_button, text_score_button_rect, score_frame])
         self.state_0_buttons.append([text_exit_button, text_exit_button_rect, exit_frame])
-
-        # print(self.state_0_buttons)
 
         self.screen.blit(scaled_bicep_left, scaled_bicep_left_rect)
         self.screen.blit(scaled_bicep_right, scaled_bicep_right_rect)
@@ -265,6 +278,7 @@ class Game:
         self.screen.fill('white')
 
         self.draw_score()
+        self.draw_lives(self.lives)
 
         if self.is_retry == 0:
             self.rnd = random.randrange(0, 24)
@@ -279,6 +293,55 @@ class Game:
         if self.is_retry == 1:
             self.is_retry = 0
 
+    def draw_lives(self, lives):
+        center_1 = (RES[0] - 25, 25)
+        center_2 = (RES[0] - 75, 25)
+        center_3 = (RES[0] - 125, 25)
+
+        heart_rect_1 = heart.get_rect()
+        heart_rect_2 = heart.get_rect()
+        heart_rect_3 = heart.get_rect()
+
+        heart_rect_1.center = center_1
+        heart_rect_2.center = center_2
+        heart_rect_3.center = center_3
+
+        match lives:
+            case 0:
+                self.screen.blit(heart_dead, heart_rect_1)
+                self.screen.blit(heart_dead, heart_rect_2)
+                self.screen.blit(heart_dead, heart_rect_3)
+            case 1:
+                self.screen.blit(heart, heart_rect_1)
+                self.screen.blit(heart_dead, heart_rect_2)
+                self.screen.blit(heart_dead, heart_rect_3)
+            case 2:
+                self.screen.blit(heart, heart_rect_1)
+                self.screen.blit(heart, heart_rect_2)
+                self.screen.blit(heart_dead, heart_rect_3)
+            case 3:
+                self.screen.blit(heart, heart_rect_1)
+                self.screen.blit(heart, heart_rect_2)
+                self.screen.blit(heart, heart_rect_3)
+            case _:
+                pass
+
+    def draw_game_over(self):
+        self.active_state = [0, 1, 0, 0, 0, 0]
+        self.screen.fill('white')
+        self.lives = 3
+
+        menu_frame = self.make_frame(text_menu_button_rect, text_menu_button_rect[2], 40)
+
+        self.state_1_buttons.append([text_menu_button, text_menu_button_rect, menu_frame])
+
+        self.draw_score()
+
+        self.screen.blit(text_game_over, text_game_over_rect)
+        self.screen.blit(text_menu_button, text_menu_button_rect)
+
+        pg.draw.rect(self.screen, 'black', menu_frame, 2)
+
     def draw(self):
 
         if self.game_state == 0:
@@ -287,8 +350,11 @@ class Game:
             else:
                 self.draw_start_screen()
 
-        elif self.game_state == 1:  # is this needed?
-            pass
+        elif self.game_state == 1:
+            if self.active_state[1]:
+                pass
+            else:
+                self.draw_game_over()
 
         elif self.game_state == 2:
             if self.active_state[2]:
@@ -338,7 +404,6 @@ class Game:
         ax.bar(letters, distribution)
         plt.show()
 
-
     def check_events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE):
@@ -360,13 +425,22 @@ class Game:
                                 self.plot_distribution()
                                 pg.quit()
                                 sys.exit()
-                    elif self.game_state == 2:  # originally was 1 TODO: change to game state 1 eventually
+                    elif self.game_state == 1:
+                        is_pressed, button_rect = self.button_clicked([pair[2] for pair in self.state_1_buttons])
+                        if is_pressed == 1:
+                            if button_rect == self.state_1_buttons[0][2]:
+                                self.game_state = 0
+                    elif self.game_state == 2:
                         is_pressed, button_rect = self.button_clicked([pair[4] for pair in self.answer_map])
                         if is_pressed == 1:
                             if self.is_correct_answer(button_rect) == 1:
                                 self.game_state = 3
                             else:
-                                self.game_state = 4
+                                if self.lives == 1:
+                                    self.game_state = 1
+                                else:
+                                    self.lives -= 1
+                                    self.game_state = 4
                         else:
                             self.game_state = 2
                     elif self.game_state == 3:

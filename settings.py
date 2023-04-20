@@ -13,7 +13,6 @@ question_font_2 = pg.font.Font('freesansbold.ttf', 34)
 question_font_3 = pg.font.Font('freesansbold.ttf', 54)
 font_score = pg.font.Font('freesansbold.ttf', 30)
 
-
 level_0_text_1 = question_font_1.render('The uppercase symbol for...', True, 'black', 'white')
 level_0_text_2 = question_font_2.render('is...', True, 'black', 'white')
 
@@ -22,9 +21,6 @@ level_1_text_2 = question_font_2.render('is...', True, 'black', 'white')
 
 level_2_text_1 = question_font_1.render('Which letter is this?', True, 'black', 'white')
 level_2_text_2 = question_font_2.render('is...', True, 'black', 'white')
-
-text_score = font_score.render('SCORE: ', True, 'black', 'white')
-text_streak = font_score.render('STREAK: ', True, 'black', 'white')
 
 level_0_text_1_rect = level_0_text_1.get_rect()
 level_0_text_1_rect.center = (RES[0]//2, (RES[1] // 9) * 1)
@@ -41,13 +37,9 @@ level_2_text_1_rect.center = (RES[0]//2, (RES[1] // 7) * 1)
 level_2_text_2_rect = level_2_text_2.get_rect()
 level_2_text_2_rect.center = (RES[0]//2, RES[1] // 2)
 
-text_score_rect = pg.Rect(0, 0, 100, 30)
-text_streak_rect = pg.Rect(0, 30, 100, 30)
-
 # draw answers
 ans_font = pg.font.Font('freesansbold.ttf', 40)
 font_buttons = pg.font.Font('freesansbold.ttf', 40)
-
 
 # draw correct answer
 font_well_done = pg.font.Font('freesansbold.ttf', 46)
@@ -74,7 +66,6 @@ text_wrong_ans_rect = text_wrong_ans.get_rect()
 
 text_wrong_hdr_rect.center = (RES[0]//2, RES[1]//2 + 100)
 text_wrong_ans_rect.center = (RES[0]//2, RES[1]//2)
-
 
 # draw start screen
 font_start = pg.font.Font('pythia.ttf', 60)
@@ -105,6 +96,19 @@ text_exit_button_rect = text_exit_button.get_rect()
 text_exit_button_rect.center = (RES[0]//2, (RES[1]//3 * 2) + 120)
 
 start_buttons = [text_start_button, text_score_button, text_exit_button]
+
+# draw game over screen
+font_game_over = pg.font.Font('pythia.ttf', 60)
+font_menu_button = pg.font.Font('freesansbold.ttf', 40)
+
+text_game_over = font_game_over.render('GAME OVER', True, 'black', 'white')
+text_menu_button = font_menu_button.render('MAIN MENU', True, 'black', 'white')
+
+text_game_over_rect = text_game_over.get_rect()
+text_menu_button_rect = text_menu_button.get_rect()
+
+text_game_over_rect.center = (RES[0]//2, RES[1]//4)
+text_menu_button_rect.center = (RES[0]//2, (RES[1]//4) * 3)
 
 # draw
 font1 = pg.font.Font('freesansbold.ttf', 52)
