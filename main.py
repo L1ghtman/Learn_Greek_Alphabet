@@ -51,6 +51,8 @@ class Game:
         self.streak = 0
         self.lives = 3
 
+        self.player_name = ''
+
         """
         levels:
         level == 0 =>, draw lowercase symbol or name ask for uppercase symbol
@@ -372,7 +374,18 @@ class Game:
             if self.active_state[4]:
                 pass
             else:
+
                 self.draw_wrong_answer()
+
+    def add_to_highscore(self, name, score, streak):
+        high_scores = open('highscores.txt', 'r')
+        scores = high_scores.readlines()
+        high_scores.close()
+        scores.append(name + ',' + str(score) + ',' + str(streak) + '\n')
+        scores.sort(key = lambda x: int(x.split(',')[1]), reverse=True)
+        high_scores = open('highscores.txt', 'w')
+        high_scores.writelines(scores)
+        high_scores.close()
 
     def add_to_log(self):
         print(self.dist)
@@ -478,6 +491,11 @@ class Game:
         return frame
 
     def run(self):
+        self.add_to_highscore('test', 100, 10)
+        self.add_to_highscore('test2', 200, 20)
+        self.add_to_highscore('test3', 300, 30)
+        self.add_to_highscore('test4', 400, 40)
+        self.add_to_highscore('test5', 500, 50)
         while True:
             self.check_events()
             self.update()
