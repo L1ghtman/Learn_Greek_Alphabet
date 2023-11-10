@@ -52,6 +52,8 @@ class Game:
         self.lives = 3
 
         self.player_name = ''
+        self.name_entered = False
+        self.input_active = False
 
         """
         levels:
@@ -182,6 +184,7 @@ class Game:
         pg.draw.rect(self.screen, 'black', self.state_4_buttons[0][2], 2)
 
     def draw_level(self, i, lvl):
+
         if self.is_retry == 1:
             k = self.retry_pos[0]
             j = self.retry_pos[1]
@@ -335,14 +338,36 @@ class Game:
 
         menu_frame = self.make_frame(text_menu_button_rect, text_menu_button_rect[2], 40)
 
-        self.state_1_buttons.append([text_menu_button, text_menu_button_rect, menu_frame])
+        self.screen.blit(text_game_over, text_game_over_rect)
 
         self.draw_score()
 
-        self.screen.blit(text_game_over, text_game_over_rect)
         self.screen.blit(text_menu_button, text_menu_button_rect)
 
         pg.draw.rect(self.screen, 'black', menu_frame, 2)
+
+        if not self.name_entered:
+            self.draw_highscore()
+        else:
+            self.state_1_buttons.append([text_menu_button, text_menu_button_rect, menu_frame])
+
+        #self.state_1_buttons.append([text_menu_button, text_menu_button_rect, menu_frame])
+
+
+    def draw_highscore(self):
+        pg.draw.rect(self.screen, 'white', pop_up_rect)
+        pop_up_frame = self.make_frame(pop_up_rect, pop_up_rect.width, pop_up_rect.height)
+        input_frame = self.make_frame(name_input_rect, name_input_rect.width, name_input_rect.height)
+        pg.draw.rect(self.screen, 'black', pop_up_frame, 2)
+        pg.draw.rect(self.screen, 'black', input_frame, 2)
+        self.screen.blit(text_pop_up, text_pop_up_rect)
+
+        # 'text_menu_button' and 'text_menu_button_rect' are not important and left as placeholders until I come up with some better solution
+        self.state_1_buttons.append([text_menu_button, text_menu_button_rect, input_frame])
+
+        input_font = pg.font.Font('pythia.ttf', 20)
+        player_name_text = input_font.render(self.player_name, True, 'black', 'white')
+        self.screen.blit(player_name_text, (input_frame.x+5, input_frame.y+5))
 
     def draw(self):
 
@@ -354,7 +379,7 @@ class Game:
 
         elif self.game_state == 1:
             if self.active_state[1]:
-                pass
+                self.draw_game_over()
             else:
                 self.draw_game_over()
 
@@ -442,7 +467,9 @@ class Game:
                         is_pressed, button_rect = self.button_clicked([pair[2] for pair in self.state_1_buttons])
                         if is_pressed == 1:
                             if button_rect == self.state_1_buttons[0][2]:
-                                self.game_state = 0
+                                self.input_active = True
+                                #if button_rect == self.state_1_buttons[2][2]:
+                                #self.game_state = 0
                     elif self.game_state == 2:
                         is_pressed, button_rect = self.button_clicked([pair[4] for pair in self.answer_map])
                         if is_pressed == 1:
@@ -465,6 +492,12 @@ class Game:
                         if is_pressed == 1:
                             self.game_state = 2
                             self.is_retry = 1
+            elif event.type == pg.KEYDOWN:
+                if self.input_active:
+                    if event.key == pg.K_BACKSPACE:
+                        self.player_name = self.player_name[:-1]
+                    else:
+                        self.player_name += event.unicode
 
     def button_clicked(self, buttons):
         pos_x, pos_y = pg.mouse.get_pos()
