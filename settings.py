@@ -118,7 +118,7 @@ text_pop_up = font_pop_up.render('You made it to the leaderboard!', True, 'black
 
 pop_up_rect = pg.Rect(RES[0]//3, RES[1]//4, 2*(RES[0]//3), 4*(RES[1]//8))
 text_pop_up_rect = text_pop_up.get_rect()
-name_input_rect = pg.Rect(0, 0, 200, 35)
+name_input_rect = pg.Rect(0, 0, 300, 35)
 
 pop_up_rect.center = (RES[0]//2, 5*(RES[1]//8))
 text_pop_up_rect.center = (RES[0]//2, RES[1]//2)
