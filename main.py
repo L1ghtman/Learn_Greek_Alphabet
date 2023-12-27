@@ -357,19 +357,23 @@ class Game:
     def draw_highscore(self):
         pg.draw.rect(self.screen, 'white', pop_up_rect)
         pop_up_frame = self.make_frame(pop_up_rect, pop_up_rect.width, pop_up_rect.height)
-        if self.input_active:
-            active_rect = pg.Rect(name_input_rect.left, name_input_rect.top, name_input_rect.width, name_input_rect.height)
-            pg.draw.rect(self.screen, 0xBDD7F4, active_rect)
         input_frame = self.make_frame(name_input_rect, name_input_rect.width, name_input_rect.height)
+        if self.input_active:
+            #active_rect = pg.Rect(name_input_rect.left, name_input_rect.top, name_input_rect.width, name_input_rect.height)
+            #pg.draw.rect(self.screen, 0xBDD7F4, active_rect)
+            pg.draw.rect(self.screen, 0x2D5FB2, input_frame, 2)
+        else:
+            pg.draw.rect(self.screen, 'black', input_frame, 2)
+
         pg.draw.rect(self.screen, 'black', pop_up_frame, 2)
-        pg.draw.rect(self.screen, 'black', input_frame, 2)
         self.screen.blit(text_pop_up, text_pop_up_rect)
 
         # 'text_menu_button' and 'text_menu_button_rect' are not important and left as placeholders until I come up with some better solution
         self.state_1_buttons.append([text_menu_button, text_menu_button_rect, input_frame])
 
         input_font = pg.font.Font('pythia.ttf', 20)
-        player_name_text = input_font.render(self.player_name, True, 'black', 0xBDD7F4)
+        #player_name_text = input_font.render(self.player_name, True, 'black', 0xBDD7F4)
+        player_name_text = input_font.render(self.player_name, True, 'black', 'white')
         self.screen.blit(player_name_text, (input_frame.x+5, input_frame.y+15))
 
 
@@ -475,6 +479,8 @@ class Game:
                                 self.input_active = True
                                 #if button_rect == self.state_1_buttons[2][2]:
                                 #self.game_state = 0
+                        else:
+                            self.input_active = False
                     elif self.game_state == 2:
                         is_pressed, button_rect = self.button_clicked([pair[4] for pair in self.answer_map])
                         if is_pressed == 1:
