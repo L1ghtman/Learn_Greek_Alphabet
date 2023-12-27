@@ -9,7 +9,6 @@ from settings import *
 
 # general
 # TODO: make sure letters dont repeat in a round
-# TODO: add high score
 # TODO: add exit button to every screen
 # TODO: add sound effects
 # TODO: add music
@@ -389,6 +388,7 @@ class Game:
         self.screen.fill('white')
 
         scores = self.get_scores()
+        scores = scores[:10]
         i = 3
         for entry in scores:
             entry = entry.split(',')
