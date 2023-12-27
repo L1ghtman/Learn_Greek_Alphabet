@@ -529,6 +529,7 @@ class Game:
                         is_pressed, button_rect = self.button_clicked([pair[2] for pair in self.state_0_buttons])
                         if is_pressed == 1:
                             if button_rect == self.state_0_buttons[0][2]:
+                                self.player_name = ''
                                 self.game_state = 2
                             elif button_rect == self.state_0_buttons[1][2]:
                                 self.game_state = 5
@@ -555,6 +556,7 @@ class Game:
                                 self.name_entered = False
                                 self.score = 0
                                 self.streak = 0
+                                self.input_active = False
                         else:
                             self.input_active = False
                     elif self.game_state == 2:
