@@ -11,7 +11,6 @@ from settings import *
 # TODO: make sure letters dont repeat in a round
 # TODO: add high score
 # TODO: add exit button to every screen
-# TODO: add lives / game over screen
 # TODO: add sound effects
 # TODO: add music
 # TODO: add game modes (time, lives, spoken etc)
@@ -54,6 +53,7 @@ class Game:
         self.player_name = ''
         self.name_entered = False
         self.input_active = False
+        self.buttons_appended = False
 
         """
         levels:
@@ -349,6 +349,7 @@ class Game:
         if not self.name_entered:
             self.draw_highscore()
         else:
+            #self.state_1_buttons = []
             self.state_1_buttons.append([text_menu_button, text_menu_button_rect, menu_frame])
 
         #self.state_1_buttons.append([text_menu_button, text_menu_button_rect, menu_frame])
@@ -358,6 +359,7 @@ class Game:
         pg.draw.rect(self.screen, 'white', pop_up_rect)
         pop_up_frame = self.make_frame(pop_up_rect, pop_up_rect.width, pop_up_rect.height)
         input_frame = self.make_frame(name_input_rect, name_input_rect.width, name_input_rect.height)
+        submit_frame = self.make_frame(text_submit_button_rect, text_submit_button_rect.width, text_submit_button_rect.height)
         if self.input_active:
             #active_rect = pg.Rect(name_input_rect.left, name_input_rect.top, name_input_rect.width, name_input_rect.height)
             #pg.draw.rect(self.screen, 0xBDD7F4, active_rect)
@@ -366,10 +368,15 @@ class Game:
             pg.draw.rect(self.screen, 'black', input_frame, 2)
 
         pg.draw.rect(self.screen, 'black', pop_up_frame, 2)
+        pg.draw.rect(self.screen, 'black', submit_frame, 2)
         self.screen.blit(text_pop_up, text_pop_up_rect)
+        self.screen.blit(text_submit_button, text_submit_button_rect)
 
-        # 'text_menu_button' and 'text_menu_button_rect' are not important and left as placeholders until I come up with some better solution
-        self.state_1_buttons.append([text_menu_button, text_menu_button_rect, input_frame])
+        if not self.buttons_appended:
+            # 'text_menu_button' and 'text_menu_button_rect' are not important and left as placeholders until I come up with some better solution
+            self.state_1_buttons.append([text_menu_button, text_menu_button_rect, input_frame])
+            self.state_1_buttons.append([text_submit_button, text_submit_button_rect, submit_frame])
+            self.buttons_appended = True
 
         input_font = pg.font.Font('pythia.ttf', 20)
         #player_name_text = input_font.render(self.player_name, True, 'black', 0xBDD7F4)
@@ -416,7 +423,7 @@ class Game:
         scores = high_scores.readlines()
         high_scores.close()
         scores.append(name + ',' + str(score) + ',' + str(streak) + '\n')
-        scores.sort(key = lambda x: int(x.split(',')[1]), reverse=True)
+        scores.sort(key=lambda x: int(x.split(',')[1]), reverse=True)
         high_scores = open('highscores.txt', 'w')
         high_scores.writelines(scores)
         high_scores.close()
@@ -475,10 +482,19 @@ class Game:
                     elif self.game_state == 1:
                         is_pressed, button_rect = self.button_clicked([pair[2] for pair in self.state_1_buttons])
                         if is_pressed == 1:
-                            if button_rect == self.state_1_buttons[0][2]:
-                                self.input_active = True
-                                #if button_rect == self.state_1_buttons[2][2]:
-                                #self.game_state = 0
+                            if not self.name_entered:
+                                if button_rect == self.state_1_buttons[0][2]:
+                                    self.input_active = True
+                                    #if button_rect == self.state_1_buttons[2][2]:
+                                    #self.game_state = 0
+                                if button_rect == self.state_1_buttons[1][2]:
+                                    self.add_to_highscore(self.player_name, self.score, self.streak)
+                                    self.name_entered = True
+                                continue
+                            if button_rect == self.state_1_buttons[2][2]:
+                                self.game_state = 0
+                                self.buttons_appended = False
+                                self.name_entered = False
                         else:
                             self.input_active = False
                     elif self.game_state == 2:
@@ -535,11 +551,6 @@ class Game:
         return frame
 
     def run(self):
-        self.add_to_highscore('test', 100, 10)
-        self.add_to_highscore('test2', 200, 20)
-        self.add_to_highscore('test3', 300, 30)
-        self.add_to_highscore('test4', 400, 40)
-        self.add_to_highscore('test5', 500, 50)
         while True:
             self.check_events()
             self.update()

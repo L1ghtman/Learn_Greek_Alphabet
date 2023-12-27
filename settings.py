@@ -113,16 +113,20 @@ text_menu_button_rect.center = (RES[0]//2, (RES[1]//4) * 3)
 # draw highscore pop-up
 font_pop_up = pg.font.Font('pythia.ttf', 30)
 font_name_input = pg.font.Font(None, 30)
+font_submit_button = pg.font.Font('pythia.ttf', 40)
 
 text_pop_up = font_pop_up.render('You made it to the leaderboard!', True, 'black', 'white')
+text_submit_button = font_submit_button.render('Submit', True, 'black', 'white')
 
 pop_up_rect = pg.Rect(RES[0]//3, RES[1]//4, 2*(RES[0]//3), 4*(RES[1]//8))
 text_pop_up_rect = text_pop_up.get_rect()
 name_input_rect = pg.Rect(0, 0, 300, 35)
+text_submit_button_rect = text_submit_button.get_rect()
 
 pop_up_rect.center = (RES[0]//2, 5*(RES[1]//8))
 text_pop_up_rect.center = (RES[0]//2, RES[1]//2)
-name_input_rect.center = (RES[0]//2, 6*(RES[1]//8))
+name_input_rect.center = (RES[0]//2, 11*(RES[1]//16))
+text_submit_button_rect.center = (RES[0]//2, 13*(RES[1]//16))
 
 # draw
 font1 = pg.font.Font('freesansbold.ttf', 52)
