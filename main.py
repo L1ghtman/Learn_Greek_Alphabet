@@ -383,7 +383,9 @@ class Game:
         player_name_text = input_font.render(self.player_name, True, 'black', 'white')
         self.screen.blit(player_name_text, (input_frame.x+5, input_frame.y+15))
 
-
+    def draw_leaderboard(self):
+        self.active_state = [0, 0, 0, 0, 0, 1]
+        self.screen.fill('white')
 
     def draw(self):
 
@@ -415,8 +417,13 @@ class Game:
             if self.active_state[4]:
                 pass
             else:
-
                 self.draw_wrong_answer()
+
+        elif self.game_state == 5:
+            if self.active_state[5]:
+                pass
+            else:
+                self.draw_leaderboard()
 
     def add_to_highscore(self, name, score, streak):
         high_scores = open('highscores.txt', 'r')
@@ -473,7 +480,7 @@ class Game:
                             if button_rect == self.state_0_buttons[0][2]:
                                 self.game_state = 2
                             elif button_rect == self.state_0_buttons[1][2]:
-                                pass
+                                self.game_state = 5
                             elif button_rect == self.state_0_buttons[2][2]:
                                 self.add_to_log()
                                 self.plot_distribution()
@@ -495,6 +502,8 @@ class Game:
                                 self.game_state = 0
                                 self.buttons_appended = False
                                 self.name_entered = False
+                                self.score = 0
+                                self.streak = 0
                         else:
                             self.input_active = False
                     elif self.game_state == 2:
