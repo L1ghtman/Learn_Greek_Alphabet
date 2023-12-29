@@ -544,8 +544,6 @@ class Game:
                             if not self.name_entered:
                                 if button_rect == self.state_1_buttons[0][2]:
                                     self.input_active = True
-                                    #if button_rect == self.state_1_buttons[2][2]:
-                                    #self.game_state = 0
                                 if button_rect == self.state_1_buttons[1][2]:
                                     self.add_to_highscore(self.player_name, self.score, self.streak)
                                     self.name_entered = True
@@ -590,8 +588,12 @@ class Game:
                 if self.input_active:
                     if event.key == pg.K_BACKSPACE:
                         self.player_name = self.player_name[:-1]
+                    elif event.key == pg.K_RETURN:
+                        self.add_to_highscore(self.player_name, self.score, self.streak)
+                        self.name_entered = True
                     else:
                         self.player_name += event.unicode
+
 
     def button_clicked(self, buttons):
         pos_x, pos_y = pg.mouse.get_pos()
