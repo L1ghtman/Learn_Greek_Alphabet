@@ -9,7 +9,6 @@ from settings import *
 
 # general
 # TODO: make sure letters dont repeat in a round
-# TODO: add high score
 # TODO: add exit button to every screen
 # TODO: add sound effects
 # TODO: add music
@@ -35,6 +34,7 @@ class Game:
         self.state_1_buttons = []
         self.state_3_buttons = []
         self.state_4_buttons = []
+        self.state_5_buttons = []
 
         self.active_state = [0, 0, 0, 0, 0, 0, 0]  # track if a game state is already active in order to be more efficient
 
@@ -52,6 +52,8 @@ class Game:
         self.lives = 3
 
         self.player_name = ''
+        self.name_entered = False
+        self.buttons_appended = False
         self.input_rect = pg.Rect(200, 200, 140, 20)
         self.active_input = False
 
@@ -184,6 +186,7 @@ class Game:
         pg.draw.rect(self.screen, 'black', self.state_4_buttons[0][2], 2)
 
     def draw_level(self, i, lvl):
+
         if self.is_retry == 1:
             k = self.retry_pos[0]
             j = self.retry_pos[1]
@@ -340,14 +343,101 @@ class Game:
 
         menu_frame = self.make_frame(text_menu_button_rect, text_menu_button_rect[2], 40)
 
-        self.state_1_buttons.append([text_menu_button, text_menu_button_rect, menu_frame])
+        self.screen.blit(text_game_over, text_game_over_rect)
 
         self.draw_score()
 
-        self.screen.blit(text_game_over, text_game_over_rect)
         self.screen.blit(text_menu_button, text_menu_button_rect)
 
         pg.draw.rect(self.screen, 'black', menu_frame, 2)
+
+        if not self.name_entered:
+            self.draw_highscore()
+        else:
+            #self.state_1_buttons = []
+            self.state_1_buttons.append([text_menu_button, text_menu_button_rect, menu_frame])
+
+        #self.state_1_buttons.append([text_menu_button, text_menu_button_rect, menu_frame])
+
+
+    def draw_highscore(self):
+        pg.draw.rect(self.screen, 'white', pop_up_rect)
+        pop_up_frame = self.make_frame(pop_up_rect, pop_up_rect.width, pop_up_rect.height)
+        input_frame = self.make_frame(name_input_rect, name_input_rect.width, name_input_rect.height)
+        submit_frame = self.make_frame(text_submit_button_rect, text_submit_button_rect.width, text_submit_button_rect.height)
+        if self.input_active:
+            #active_rect = pg.Rect(name_input_rect.left, name_input_rect.top, name_input_rect.width, name_input_rect.height)
+            #pg.draw.rect(self.screen, 0xBDD7F4, active_rect)
+            pg.draw.rect(self.screen, 0x2D5FB2, input_frame, 2)
+        else:
+            pg.draw.rect(self.screen, 'black', input_frame, 2)
+
+        pg.draw.rect(self.screen, 'black', pop_up_frame, 2)
+        pg.draw.rect(self.screen, 'black', submit_frame, 2)
+        self.screen.blit(text_pop_up, text_pop_up_rect)
+        self.screen.blit(text_submit_button, text_submit_button_rect)
+
+        if not self.buttons_appended:
+            # 'text_menu_button' and 'text_menu_button_rect' are not important and left as placeholders until I come up with some better solution
+            self.state_1_buttons.append([text_menu_button, text_menu_button_rect, input_frame])
+            self.state_1_buttons.append([text_submit_button, text_submit_button_rect, submit_frame])
+            self.buttons_appended = True
+
+        input_font = pg.font.Font('pythia.ttf', 20)
+        #player_name_text = input_font.render(self.player_name, True, 'black', 0xBDD7F4)
+        player_name_text = input_font.render(self.player_name, True, 'black', 'white')
+        self.screen.blit(player_name_text, (input_frame.x+5, input_frame.y+15))
+
+    def draw_leaderboard(self):
+        self.active_state = [0, 0, 0, 0, 0, 1]
+        self.screen.fill('white')
+
+        scores = self.get_scores()
+        scores = scores[:10]
+        i = 3
+        for entry in scores:
+            entry = entry.split(',')
+            entry[2] = entry[2].strip('\n')
+
+            text_leaderboard_entry_name = font_entry.render(entry[0], True, 'black', 'white')
+            text_leaderboard_entry_score = font_entry.render(entry[1], True, 'black', 'white')
+            text_leaderboard_entry_streak = font_entry.render(entry[2], True, 'black', 'white')
+
+            text_leaderboard_entry_name_rect = text_leaderboard_entry_name.get_rect()
+            text_leaderboard_entry_score_rect = text_leaderboard_entry_score.get_rect()
+            text_leaderboard_entry_streak_rect = text_leaderboard_entry_streak.get_rect()
+
+            text_leaderboard_entry_name_rect.center = (2*(RES[0]//5), i*(RES[1]//14))
+            text_leaderboard_entry_score_rect.center = (3*(RES[0]//5), i*(RES[1]//14))
+            text_leaderboard_entry_streak_rect.center = (4*(RES[0]//5), i*(RES[1]//14))
+
+            self.screen.blit(text_leaderboard_entry_name, text_leaderboard_entry_name_rect)
+            self.screen.blit(text_leaderboard_entry_score, text_leaderboard_entry_score_rect)
+            self.screen.blit(text_leaderboard_entry_streak, text_leaderboard_entry_streak_rect)
+
+            i += 1
+
+        self.screen.blit(text_leaderboard_title, text_leaderboard_title_rect)
+        self.screen.blit(text_leaderboard_position, text_leaderboard_position_rect)
+        self.screen.blit(text_leaderboard_name, text_leaderboard_name_rect)
+        self.screen.blit(text_leaderboard_score, text_leaderboard_score_rect)
+        self.screen.blit(text_leaderboard_streak, text_leaderboard_streak_rect)
+        self.screen.blit(text_leaderboard_exit_button, text_leaderboard_exit_button_rect)
+        self.screen.blit(text_leaderboard_pos1, text_leaderboard_pos1_rect)
+        self.screen.blit(text_leaderboard_pos2, text_leaderboard_pos2_rect)
+        self.screen.blit(text_leaderboard_pos3, text_leaderboard_pos3_rect)
+        self.screen.blit(text_leaderboard_pos4, text_leaderboard_pos4_rect)
+        self.screen.blit(text_leaderboard_pos5, text_leaderboard_pos5_rect)
+        self.screen.blit(text_leaderboard_pos6, text_leaderboard_pos6_rect)
+        self.screen.blit(text_leaderboard_pos7, text_leaderboard_pos7_rect)
+        self.screen.blit(text_leaderboard_pos8, text_leaderboard_pos8_rect)
+        self.screen.blit(text_leaderboard_pos9, text_leaderboard_pos9_rect)
+        self.screen.blit(text_leaderboard_pos10, text_leaderboard_pos10_rect)
+
+        exit_button_frame = self.make_frame(text_leaderboard_exit_button_rect, text_leaderboard_exit_button_rect.width, text_leaderboard_exit_button_rect.height)
+        pg.draw.rect(self.screen, 'black', exit_button_frame, 2)
+        self.state_5_buttons.append([text_leaderboard_exit_button, text_leaderboard_exit_button_rect, exit_button_frame])
+
 
     def draw(self):
 
@@ -359,7 +449,7 @@ class Game:
 
         elif self.game_state == 1:
             if self.active_state[1]:
-                pass
+                self.draw_game_over()
             else:
                 self.draw_game_over()
 
@@ -407,8 +497,12 @@ class Game:
         high_scores = open('highscores.txt', 'r')
         scores = high_scores.readlines()
         high_scores.close()
+        return scores
+
+    def add_to_highscore(self, name, score, streak):
+        scores = self.get_scores()
         scores.append(name + ',' + str(score) + ',' + str(streak) + '\n')
-        scores.sort(key = lambda x: int(x.split(',')[1]), reverse=True)
+        scores.sort(key=lambda x: int(x.split(',')[1]), reverse=True)
         high_scores = open('highscores.txt', 'w')
         high_scores.writelines(scores)
         high_scores.close()
@@ -465,9 +559,10 @@ class Game:
                         is_pressed, button_rect = self.button_clicked([pair[2] for pair in self.state_0_buttons])
                         if is_pressed == 1:
                             if button_rect == self.state_0_buttons[0][2]:
+                                self.player_name = ''
                                 self.game_state = 2
                             elif button_rect == self.state_0_buttons[1][2]:
-                                pass
+                                self.game_state = 5
                             elif button_rect == self.state_0_buttons[2][2]:
                                 self.add_to_log()
                                 self.plot_distribution()
@@ -476,8 +571,22 @@ class Game:
                     elif self.game_state == 1:
                         is_pressed, button_rect = self.button_clicked([pair[2] for pair in self.state_1_buttons])
                         if is_pressed == 1:
-                            if button_rect == self.state_1_buttons[0][2]:
+                            if not self.name_entered:
+                                if button_rect == self.state_1_buttons[0][2]:
+                                    self.input_active = True
+                                if button_rect == self.state_1_buttons[1][2]:
+                                    self.add_to_highscore(self.player_name, self.score, self.streak)
+                                    self.name_entered = True
+                                continue
+                            if button_rect == self.state_1_buttons[2][2]:
                                 self.game_state = 0
+                                self.buttons_appended = False
+                                self.name_entered = False
+                                self.score = 0
+                                self.streak = 0
+                                self.input_active = False
+                        else:
+                            self.input_active = False
                     elif self.game_state == 2:
                         is_pressed, button_rect = self.button_clicked([pair[4] for pair in self.answer_map])
                         if is_pressed == 1:
@@ -500,6 +609,21 @@ class Game:
                         if is_pressed == 1:
                             self.game_state = 2
                             self.is_retry = 1
+                    elif self.game_state == 5:
+                        is_pressed, button_rect = self.button_clicked([pair[2] for pair in self.state_5_buttons])
+                        if is_pressed == 1:
+                            if button_rect == self.state_5_buttons[0][2]:
+                                self.game_state = 0
+            elif event.type == pg.KEYDOWN:
+                if self.input_active:
+                    if event.key == pg.K_BACKSPACE:
+                        self.player_name = self.player_name[:-1]
+                    elif event.key == pg.K_RETURN:
+                        self.add_to_highscore(self.player_name, self.score, self.streak)
+                        self.name_entered = True
+                    else:
+                        self.player_name += event.unicode
+
 
     def button_clicked(self, buttons):
         pos_x, pos_y = pg.mouse.get_pos()
