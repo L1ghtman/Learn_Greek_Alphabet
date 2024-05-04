@@ -11,11 +11,11 @@ from settings import *
 # TODO: make sure letters dont repeat in a round
 # TODO: add high score
 # TODO: add exit button to every screen
-# TODO: add lives / game over screen
 # TODO: add sound effects
 # TODO: add music
 # TODO: add game modes (time, lives, spoken etc)
 # TODO: increase probability of letters that weren't guessed correctly
+# TODO: name-specific high score
 
 class Game:
     def __init__(self):
@@ -36,7 +36,7 @@ class Game:
         self.state_3_buttons = []
         self.state_4_buttons = []
 
-        self.active_state = [0, 0, 0, 0, 0, 0]  # track if a game state is already active in order to be more efficient
+        self.active_state = [0, 0, 0, 0, 0, 0, 0]  # track if a game state is already active in order to be more efficient
 
         self.rnd = 0
 
@@ -52,6 +52,8 @@ class Game:
         self.lives = 3
 
         self.player_name = ''
+        self.input_rect = pg.Rect(200, 200, 140, 20)
+        self.active_input = False
 
         """
         levels:
@@ -108,7 +110,7 @@ class Game:
             self.screen.blit(self.answer_map[a][0], self.answer_map[a][1])
 
     def draw_correct_answer(self):
-        self.active_state = [0, 0, 0, 1, 0, 0]
+        self.active_state = [0, 0, 0, 1, 0, 0, 0]
         self.state_3_buttons = []
         self.screen.fill('white')
         self.score = self.score + 1
@@ -148,7 +150,7 @@ class Game:
         pg.draw.rect(self.screen, 'black', self.state_3_buttons[0][2], 2)
 
     def draw_wrong_answer(self):
-        self.active_state = [0, 0, 0, 0, 1, 0]
+        self.active_state = [0, 0, 0, 0, 1, 0, 0]
         self.state_4_buttons = []
         self.screen.fill('white')
         self.streak = 0
@@ -251,7 +253,7 @@ class Game:
         self.screen.blit(text_streak, text_streak_rect)
 
     def draw_start_screen(self):
-        self.active_state = [1, 0, 0, 0, 0, 0]
+        self.active_state = [1, 0, 0, 0, 0, 0, 0]
         self.screen.fill('white')
 
         start_frame = self.make_frame(text_start_button_rect, 200, 40)  # text_start_button_rect[2] <- use this to make the frame the same width as the button
@@ -276,7 +278,7 @@ class Game:
         pg.draw.rect(self.screen, 'black', exit_frame, 2)
 
     def draw_game_screen(self):
-        self.active_state = [0, 0, 1, 0, 0, 0]
+        self.active_state = [0, 0, 1, 0, 0, 0, 0]
         self.screen.fill('white')
 
         self.draw_score()
@@ -329,9 +331,12 @@ class Game:
                 pass
 
     def draw_game_over(self):
-        self.active_state = [0, 1, 0, 0, 0, 0]
+        self.active_state = [0, 1, 0, 0, 0, 0, 0]
         self.screen.fill('white')
         self.lives = 3
+
+        if self.score > self.get_tenth():
+            self.draw_leaderboard_entry()
 
         menu_frame = self.make_frame(text_menu_button_rect, text_menu_button_rect[2], 40)
 
@@ -374,8 +379,29 @@ class Game:
             if self.active_state[4]:
                 pass
             else:
-
                 self.draw_wrong_answer()
+
+        elif self.game_state == 5:
+            if self.active_state[5]:
+                pass
+            else:
+                self.draw_leaderboard_entry()
+
+    def draw_leaderboard_entry(self):
+        # input_rect = pg.Rect(200, 200, 140, 20)
+        input_font = pg.font.Font('freesansbold.ttf', 20)
+        self.player_name = ''
+        self.active_input = False
+        color_active = pg.Color('lightskyblue3')
+        color_passive = pg.Color('gray15')
+        color = color_passive
+
+    def get_tenth(self):
+        high_scores = open('highscores.txt', 'r')
+        scores = high_scores.readlines()
+        high_scores.close()
+        tenth = scores[9].split(',')
+        return int(tenth[1])
 
     def add_to_highscore(self, name, score, streak):
         high_scores = open('highscores.txt', 'r')
@@ -424,7 +450,16 @@ class Game:
                 self.plot_distribution()
                 pg.quit()
                 sys.exit()
+            elif event.type == pg.KEYDOWN and self.game_state == 5:
+                if event.key == pg.K_BACKSPACE:
+                    self.player_name = self.player_name[:-1]
+                else:
+                    self.player_name += event.unicode
             elif event.type == pg.MOUSEBUTTONDOWN:
+                if self.input_rect.collidepoint(event.pos):
+                    self.active_input = True
+                else:
+                    self.active_input = False
                 if event.button == 1:
                     if self.game_state == 0:
                         is_pressed, button_rect = self.button_clicked([pair[2] for pair in self.state_0_buttons])
@@ -491,11 +526,6 @@ class Game:
         return frame
 
     def run(self):
-        self.add_to_highscore('test', 100, 10)
-        self.add_to_highscore('test2', 200, 20)
-        self.add_to_highscore('test3', 300, 30)
-        self.add_to_highscore('test4', 400, 40)
-        self.add_to_highscore('test5', 500, 50)
         while True:
             self.check_events()
             self.update()
